@@ -59,3 +59,15 @@ CREATE TABLE IF NOT EXISTS hashLinkrs (
 	    REFERENCES linkrs("id")
 	    ON DELETE CASCADE
 );
+
+INSERT INTO users ("username", "email", "password", "pictureUrl") VALUES
+('pele', 'pele@uol.com', '123456', 'https://m.media-amazon.com/images/M/MV5BNGE0MjRkMWYtZGJlMi00YmZiLWJiY2QtMGRlMjRlNDU4MjFjXkEyXkFqcGdeQXVyNjc5NjEzNA@@._V1_.jpg');
+
+INSERT INTO users ("username", "email", "password", "pictureUrl") VALUES
+('didi', 'didi@uol.com', '123456', 'https://upload.wikimedia.org/wikipedia/pt/thumb/a/a2/Didi-RenatoArag%C3%A3o.jpg/250px-Didi-RenatoArag%C3%A3o.jpg');
+
+INSERT INTO linkrs ("linkUrl", "text", "userId") VALUES
+('https://www.uol.com.br', 'Uol Teste', '1');
+
+INSERT INTO linkrs ("linkUrl", "text", "userId") VALUES
+('https://g1.globo.com/', 'G1 Teste', '2');
