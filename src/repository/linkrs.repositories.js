@@ -8,3 +8,12 @@ export function insertLinkDB(linkUrl, text, userId) {
     [linkUrl, text, userId]
   );
 }
+
+export function selectLastLinks() {
+  return connection.query(
+    `SELECT linkrs.id, "linkUrl", "text", users."pictureUrl" AS "userPicture" FROM linkrs
+      JOIN users ON linkrs."userId" = users.id
+      ORDER BY linkrs.id DESC LIMIT 20
+    `
+  );
+}
