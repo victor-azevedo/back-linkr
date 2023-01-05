@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import urlMetadata from "url-metadata";
 import {
   insertLinkDB,
   selectLastLinks,
@@ -36,7 +37,21 @@ export async function getLinks(req, res) {
       return;
     }
 
-    res.send(queryResult.rows);
+    const links = [...queryResult.rows];
+
+    const linksWithMetadata = await Promise.all(
+      links.map(async (link) => {
+        const linkMetadata = await urlMetadata(link.linkUrl);
+        const { title, description, image } = linkMetadata;
+        const linkWithMetadata = {
+          ...link,
+          linkMetadata: { title, description, image },
+        };
+        return linkWithMetadata;
+      })
+    );
+
+    res.send(linksWithMetadata);
   } catch (error) {
     console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
     return res.sendStatus(500);
