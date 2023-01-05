@@ -6,7 +6,7 @@ import {
 } from "../repository/linkrs.repositories.js";
 
 export async function insertLink(req, res) {
-  const userId = req.userId;
+  const userId = 1;
   const { linkUrl, text } = req.body;
 
   try {
@@ -41,13 +41,25 @@ export async function getLinks(req, res) {
 
     const linksWithMetadata = await Promise.all(
       links.map(async (link) => {
-        const linkMetadata = await urlMetadata(link.linkUrl);
-        const { title, description, image } = linkMetadata;
-        const linkWithMetadata = {
-          ...link,
-          linkMetadata: { title, description, image },
-        };
-        return linkWithMetadata;
+        try {
+          const linkMetadata = await urlMetadata(link.linkUrl);
+          const { title, description, image } = linkMetadata;
+          const linkWithMetadata = {
+            ...link,
+            linkMetadata: { title, description, image },
+          };
+          return linkWithMetadata;
+        } catch (error) {
+          return {
+            ...link,
+            linkMetadata: {
+              title: "",
+              description: "",
+              image:
+                "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
+            },
+          };
+        }
       })
     );
 
