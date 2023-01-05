@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import chalk from "chalk";
-import dayjs from "dayjs";
 import { insertUser } from "../repository/auth.repositories.js";
 
 
@@ -16,7 +15,7 @@ export async function signUp(req, res){
 
     } catch (err) {
         console.log(
-          chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), err.message)
+          chalk.redBright(err.message)
         );
         res.sendStatus(500);
       }
