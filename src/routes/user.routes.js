@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getUserInUserPage, searchUserQuery } from "../controllers/user.controllers.js";
-import { validateIdForUserPage, validateUserQuery } from "../middlewares/user.middleware.js";
+import { validateIdForUserPage, validateUserQuery } from "../middlewares/userSchemaValidation.middleware.js";
 
 const userRouter = Router();
 
