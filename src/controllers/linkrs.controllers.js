@@ -3,9 +3,12 @@ import urlMetadata from "url-metadata";
 import {
   insertLinkDB,
   selectLastLinks,
+  insertLikeLinkDB,
+  removeLikeLinkDB,
 } from "../repository/linkrs.repositories.js";
 
 export async function insertLink(req, res) {
+  // const userId = res.locals.user.id;
   const userId = 1;
   const { linkUrl, text } = req.body;
 
@@ -21,7 +24,7 @@ export async function insertLink(req, res) {
       return;
     }
 
-    res.sendStatus(200);
+    res.sendStatus(201);
   } catch (error) {
     console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
     return res.sendStatus(500);
@@ -29,8 +32,11 @@ export async function insertLink(req, res) {
 }
 
 export async function getLinks(req, res) {
+  // const userId = res.locals.user.id;
+  const userId = 1;
+
   try {
-    const queryResult = await selectLastLinks();
+    const queryResult = await selectLastLinks(userId);
 
     if (queryResult.rowCount === 0) {
       res.status(200).send("There are no post yet");
@@ -64,6 +70,54 @@ export async function getLinks(req, res) {
     );
 
     res.send(linksWithMetadata);
+  } catch (error) {
+    console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
+    return res.sendStatus(500);
+  }
+}
+
+export async function likeLink(req, res) {
+  // const likerId = res.locals.user.id;
+  const likerId = 2;
+  const linkId = req.params.id;
+
+  try {
+    const queryResult = await insertLikeLinkDB(likerId, linkId);
+
+    if (queryResult.rowCount === 0) {
+      console.log(
+        dayjs().format("YYYY-MM-DD HH:mm:ss"),
+        "- BAD_REQUEST: error at insert like"
+      );
+      res.status(401).send("error at insert like");
+      return;
+    }
+
+    res.sendStatus(201);
+  } catch (error) {
+    console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
+    return res.sendStatus(500);
+  }
+}
+
+export async function dislikeLink(req, res) {
+  // const dislikerId = res.locals.user.id;
+  const dislikerId = 1;
+  const linkId = req.params.id;
+
+  try {
+    const queryResult = await removeLikeLinkDB(dislikerId, linkId);
+
+    if (queryResult.rowCount === 0) {
+      console.log(
+        dayjs().format("YYYY-MM-DD HH:mm:ss"),
+        "- BAD_REQUEST: error at remove like"
+      );
+      res.status(401).send("error at remove like");
+      return;
+    }
+
+    res.sendStatus(201);
   } catch (error) {
     console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
     return res.sendStatus(500);
