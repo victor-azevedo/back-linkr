@@ -41,7 +41,6 @@ export function authValidation(req, res, next) {
       res.status(401).send("Bearer inválido");
       return;
     }
-
     const user = jwt.verify(token, process.env.SECRET_JWT);
     res.locals.user = user;
   } catch (error) {
