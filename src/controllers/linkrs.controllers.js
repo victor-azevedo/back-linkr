@@ -3,6 +3,7 @@ import urlMetadata from "url-metadata";
 import {
   insertLinkDB,
   selectLastLinks,
+  usersLikedLinks,
   insertLikeLinkDB,
   removeLikeLinkDB,
 } from "../repository/linkrs.repositories.js";
@@ -42,8 +43,10 @@ export async function getLinks(req, res) {
       res.status(200).send("There are no post yet");
       return;
     }
-
     const links = [...queryResult.rows];
+
+    const queryLikesResult = await usersLikedLinks(userId);
+    const linksLikes = [...queryLikesResult.rows];
 
     const linksWithMetadata = await Promise.all(
       links.map(async (link) => {
@@ -69,7 +72,24 @@ export async function getLinks(req, res) {
       })
     );
 
-    res.send(linksWithMetadata);
+    const linksWithMetadataAndLikes = linksWithMetadata.map(
+      (linkWithMetadata) => {
+        const linkLikesFound = linksLikes.find(
+          ({ linkId }) => Number(linkId) === Number(linkWithMetadata.id)
+        );
+        const isUserLiked = linkWithMetadata.likerId ? true : false;
+        delete linkWithMetadata.likerId;
+        return linkLikesFound
+          ? {
+              ...linkWithMetadata,
+              isUserLiked,
+              usersLiked: [...linkLikesFound.likers],
+            }
+          : { ...linkWithMetadata, isUserLiked, usersLiked: [] };
+      }
+    );
+
+    res.send(linksWithMetadataAndLikes);
   } catch (error) {
     console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
     return res.sendStatus(500);
@@ -78,7 +98,7 @@ export async function getLinks(req, res) {
 
 export async function likeLink(req, res) {
   // const likerId = res.locals.user.id;
-  const likerId = 2;
+  const likerId = 1;
   const linkId = req.params.id;
 
   try {
