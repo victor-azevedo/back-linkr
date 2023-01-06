@@ -8,11 +8,26 @@ export function insertLinkDB(linkUrl, text, userId) {
   );
 }
 
-export function selectLastLinks() {
+export function selectLastLinks(userId) {
   return connection.query(
-    `SELECT linkrs.id, "linkUrl", "text", users."username", users."pictureUrl" AS "userPictureUrl" FROM linkrs
+    `SELECT linkrs.id, "linkUrl", "text", users."username", users."pictureUrl" AS "userPictureUrl", likes."likerId" FROM linkrs
       JOIN users ON linkrs."userId" = users.id
-      ORDER BY linkrs.id DESC LIMIT 20
-    `
+      LEFT JOIN likes ON linkrs.id = likes."linkId" AND likes."likerId" = $1
+      ORDER BY linkrs.id DESC LIMIT 20`,
+    [userId]
+  );
+}
+
+export function insertLikeLinkDB(likerId, linkId) {
+  return connection.query(
+    `INSERT INTO likes ("likerId", "linkId") VALUES ($1, $2);`,
+    [likerId, linkId]
+  );
+}
+
+export function removeLikeLinkDB(likerId, linkId) {
+  return connection.query(
+    `DELETE FROM likes WHERE "likerId" = $1 AND "linkId" = $2;`,
+    [likerId, linkId]
   );
 }

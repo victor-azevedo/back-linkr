@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS likes (
   "id" SERIAL PRIMARY KEY,
   "likerId" BIGINT NOT NULL,
   "linkId" BIGINT NOT NULL,
+  UNIQUE ("likerId","linkId"),
   CONSTRAINT fk_liker
     FOREIGN KEY("likerId") 
 	    REFERENCES users("id")
