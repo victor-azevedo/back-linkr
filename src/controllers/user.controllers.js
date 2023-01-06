@@ -6,9 +6,9 @@ export async function searchUserQuery(req, res) {
 
         const { rows: users } = await connection.query(
             ` 
-            SELECT id, username, "profileUrl"
+            SELECT id, username, "pictureUrl"
             FROM ${usersTb}
-            WHERE username ILIKE CONCAT($1, '%') 
+            WHERE username ILIKE CONCAT($1::text, '%') 
         `,
             [searchText]
         );
