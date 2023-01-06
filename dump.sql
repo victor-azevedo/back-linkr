@@ -72,3 +72,15 @@ INSERT INTO linkrs ("linkUrl", "text", "userId") VALUES
 
 INSERT INTO linkrs ("linkUrl", "text", "userId") VALUES
 ('https://g1.globo.com/', 'G1 Teste', '2');
+
+INSERT INTO hashtags ("hashtag") VALUES
+('hello-hashtag');
+
+INSERT INTO hashtags ("hashtag") VALUES
+('secondhashtag');
+
+INSERT INTO hashlinkrs ("hashtagId", "linkId") VALUES
+(1, 1);
+
+INSERT INTO hashlinks ("hashtagId", "linkId") VALUES
+(2, 1);

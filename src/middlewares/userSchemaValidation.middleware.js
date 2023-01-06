@@ -14,7 +14,7 @@ export async function validateUserQuery (req, res, next) {
     }
 }
 
-export async function validateIdForUserPage (req, rex, next) {
+export async function validateIdForUserPage (req, res, next) {
     try {
         const userIdToValidate = req.params.id;
         const userIdValidated = await userIdSchema.validateAsync(userIdToValidate);
