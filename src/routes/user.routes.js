@@ -6,7 +6,7 @@ import { validateIdForUserPage, validateUserQuery } from "../middlewares/userSch
 const userRouter = Router();
 
 
-userRouter.post('/user/query', validateUserQuery, searchUserQuery);
+userRouter.post('/user/query', authValidation, validateUserQuery, searchUserQuery);
 userRouter.get('/user/:id', authValidation, validateIdForUserPage, getUserInUserPage);
 
 
