@@ -8,3 +8,6 @@ export const linkSchema = joi.object({
     .required(),
   text: joi.string().empty(""),
 });
+
+
+export const linkrIdSchema = joi.string().regex(/^[0-9]+$/).required();

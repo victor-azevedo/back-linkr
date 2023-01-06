@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import urlMetadata from "url-metadata";
+import connection, { hashLinkrsTb, linkrsTb, usersTb } from "../database/db.js";
 import {
   insertLinkDB,
   selectLastLinks,
@@ -121,5 +122,23 @@ export async function dislikeLink(req, res) {
   } catch (error) {
     console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
     return res.sendStatus(500);
+  }
+}
+
+
+export async function deleteLink (req, res) {
+  try {
+    const { linkrId } = res.locals;
+    const { user } = res.locals;
+    
+    await connection.query(`
+    DELETE FROM ${linkrsTb} WHERE id = $1;
+    DELETE FROM ${hashLinkrsTb} WHERE "linkId" = $1;
+    `, [linkrId, user.id])
+
+    res.sendStatus(200);
+  } catch (err) {
+    res.status(400).send(err);
+    console.log(err)
   }
 }

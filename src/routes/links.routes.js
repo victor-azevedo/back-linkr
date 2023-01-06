@@ -1,19 +1,21 @@
 import { Router } from "express";
-
 import {
   insertLink,
   getLinks,
   likeLink,
   dislikeLink,
+  deleteLink,
 } from "../controllers/linkrs.controllers.js";
-import { linkSchemaValidation } from "../middlewares/linkSchameValidation.middleware.js";
+import { linkDeletionIdValidation, linkSchemaValidation } from "../middlewares/linkSchameValidation.middleware.js";
 import { authValidation } from "../middlewares/authValidation.middleware.js";
 
-const router = Router();
+const linksRouter = Router();
 
-router.get("/linkrs", getLinks);
-router.post("/linkrs", linkSchemaValidation, insertLink);
-router.post("/linkrs/like/:id", likeLink);
-router.delete("/linkrs/like/:id", dislikeLink);
+linksRouter.get("/linkrs", getLinks);
+linksRouter.post("/linkrs", linkSchemaValidation, insertLink);
+linksRouter.post("/linkrs/like/:id", likeLink);
+linksRouter.delete("/linkrs/like/:id", dislikeLink);
+linksRouter.delete("/linkrs/delete/:id", authValidation, linkDeletionIdValidation, deleteLink);
+linksRouter.put("/linkrs/delete/:id");
 
-export default router;
+export default linksRouter;
