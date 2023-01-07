@@ -16,8 +16,26 @@ async function getPostsByHashtag(hashtag) {
         posts.push(post.rows[0]);
     }
     return posts;
-    
 }
 
-export { getPostsByHashtag };
+async function getUsersById(id) { //get id, username, userPictureUrl
+    const users = await connection.query(`
+        SELECT * FROM users WHERE id = $1`
+        , [id]);
+    return users.rows;
+}
 
+async function getLikesById(id){
+    const likes = await connection.query(`
+        SELECT * FROM likes WHERE "linkId" = $1`
+        , [id]);
+    return likes.rows;
+}
+
+export { getPostsByHashtag, getUsersById };
+
+
+// link,
+// text,
+// linkMetadata,
+// linkIsliked,
