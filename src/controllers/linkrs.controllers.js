@@ -155,20 +155,40 @@ export async function dislikeLink(req, res) {
   }
 }
 
+export async function deleteLink(req, res) {
+    try {
+        const { linkrId, user } = res.locals;
 
-export async function deleteLink (req, res) {
-  try {
-    const { linkrId } = res.locals;
-    const { user } = res.locals;
-    
-    await connection.query(`
+        await connection.query(
+            `
     DELETE FROM ${linkrsTb} WHERE id = $1;
     DELETE FROM ${hashLinkrsTb} WHERE "linkId" = $1;
-    `, [linkrId, user.id])
+    `,
+            [linkrId, user.id]
+        );
 
-    res.sendStatus(200);
-  } catch (err) {
-    res.status(400).send(err);
-    console.log(err)
-  }
+        res.sendStatus(200);
+    } catch (err) {
+        res.status(400).send(err);
+        console.log(err);
+    }
+}
+
+export async function editLink(req, res) {
+    try {
+      const { textToUpdate, linkrId } = res.locals;
+      await connection.query(
+        `
+        UPDATE ${linkrsTb}
+        SET text = $1
+        WHERE id = $2
+        `,
+        [textToUpdate, linkrId]
+        );
+        res.sendStatus(200)
+      } catch (err) {
+        res.status(400);
+        res.send(err);
+        console.log(err);
+    }
 }
