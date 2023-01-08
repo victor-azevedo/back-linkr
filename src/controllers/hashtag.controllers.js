@@ -1,4 +1,4 @@
-import { getPostsByHashtag, getUsersById } from "../repository/hashtag.repositories.js";
+import { getPostsByHashtag, getUsersById, rankingHashtags } from "../repository/hashtag.repositories.js";
 import urlMetadata from "url-metadata";
 
 async function getPostsByHashtags(req, res) {
@@ -32,7 +32,17 @@ async function getPostsByHashtags(req, res) {
     }
 }
 
-export { getPostsByHashtags };
+async function getRankingHashtags(req, res) {
+    try {
+        const hashtags = await rankingHashtags();
+        return res.status(200).send(hashtags);
+    }catch (error) {
+        console.log(error);
+        return res.status(500).send(error);
+}
+}
+
+export { getPostsByHashtags, getRankingHashtags };
 
 
 // id,
