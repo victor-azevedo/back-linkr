@@ -16,7 +16,7 @@ export function findUser(email, username) {
 
 export function selectUser(email) {
   return connection.query(
-    `SELECT id, email, password, "pictureUrl" FROM users WHERE email=$1`,
+    `SELECT id, email, password, "pictureUrl", username FROM users WHERE email=$1`,
     [email]
   );
 }
