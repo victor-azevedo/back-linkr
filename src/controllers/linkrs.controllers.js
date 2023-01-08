@@ -13,9 +13,39 @@ export async function insertLink(req, res) {
   // const userId = res.locals.user.id;
   const userId = 1;
   const { linkUrl, text } = req.body;
+  const hashtags = filterHashtags(text);
+  
+  //filtro de hashtags
+  function filterHashtags(text) {
+    const words = text.split(" ");
+    const hashtags = words.filter((word) => word.startsWith("#")).map((word) => word.substring(1));
+    console.log(hashtags);
+    return hashtags;
+  }
 
   try {
     const queryResult = await insertLinkDB(linkUrl, text, userId);
+
+    //função abaixo foi criada para inserir hashtags no banco de dados
+    async function insertHashtag(hashtag) {
+      const hashtagExists = await connection.query(
+        `SELECT * FROM hashtags WHERE "hashtag" = $1;`,
+        [hashtag]
+      );
+      if (hashtagExists.rowCount === 0) {
+        await connection.query(
+          `INSERT INTO hashtags ("hashtag", "counter") VALUES ($1, $2);`,
+          [hashtag, 1]
+        );
+      } else {
+        await connection.query(
+          `UPDATE hashtags SET "counter" = "counter" + 1 WHERE "hashtag" = $1;`,
+          [hashtag]
+        );
+      }
+    }
+      
+    //Abaixo não foi alterado, exceto a linha com comentario
 
     if (queryResult.rowCount === 0) {
       console.log(
@@ -25,13 +55,16 @@ export async function insertLink(req, res) {
       res.status(401).send("inserted none");
       return;
     }
-
+    for (let hashtag of hashtags) { //aqui foi alterado
+      await insertHashtag(hashtag);
+    }    
     res.sendStatus(201);
   } catch (error) {
     console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
     return res.sendStatus(500);
   }
 }
+
 
 export async function getLinks(req, res) {
   // const userId = res.locals.user.id;
