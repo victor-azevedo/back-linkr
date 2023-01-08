@@ -2,8 +2,9 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import dayjs from "dayjs";
-
 import linkrRoutes from "./routes/links.routes.js";
+import routesAuth from "./routes/auth.routes.js";
+import userRouter from "./routes/user.routes.js";
 
 dotenv.config();
 import routesAuth from "./routes/auth.routes.js";
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(routesAuth);
 app.use(linkrRoutes);
 app.use(hashtagRoutes);
+app.use(userRouter);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
