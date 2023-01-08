@@ -7,9 +7,7 @@ async function getPostsByHashtags(req, res) {
         const posts = await getPostsByHashtag(hashtag);
         
         if (posts.rowCount === 0) {
-            res.status(200).send("There are no post yet");
-            return;
-          }
+            return res.status(200).send("There are no post yet");}
 
         const object = [];
         for(let i = 0; i < posts.length; i++) {
@@ -23,9 +21,8 @@ async function getPostsByHashtags(req, res) {
                 link: posts[i].linkUrl,
                 text: posts[i].text,
                 linkMetadata: { title, description, image },
-                linkIsliked: posts[i].linkIsliked
-
-            }
+                linkIsliked: posts[i].linkIsliked,}
+                
             object.push(post);
         }
         return res.status(200).send(object);
