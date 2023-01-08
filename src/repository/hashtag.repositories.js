@@ -25,14 +25,15 @@ async function getUsersById(id) { //get id, username, userPictureUrl
     return users.rows;
 }
 
-async function getLikesById(id){
-    const likes = await connection.query(`
-        SELECT * FROM likes WHERE "linkId" = $1`
-        , [id]);
-    return likes.rows;
+async function rankingHashtags() {
+    const hashtags = await connection.query(`
+        SELECT * FROM hashtags ORDER BY "counter" DESC LIMIT 10`);
+    return hashtags.rows;
 }
 
-export { getPostsByHashtag, getUsersById };
+
+
+export { getPostsByHashtag, getUsersById, rankingHashtags };
 
 
 // link,
