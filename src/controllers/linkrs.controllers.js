@@ -81,8 +81,6 @@ export async function getLinks(req, res) {
 
   try {
     const queryResult = await selectLastLinks(userId);
-    console.log(queryResult.rows)
-    res.send(queryResult)
 
     if (queryResult.rowCount === 0) {
       res.status(200).send(null);
