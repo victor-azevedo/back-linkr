@@ -1,10 +1,10 @@
 import connection, { linkrsTb } from "../database/db.js";
 
-export function insertLinkDB(linkUrl, text, userId) {
+export function insertLinkDB(linkUrl, text, userId, hashtags) {
     return connection.query(
-        `INSERT INTO linkrs ("linkUrl", "text", "userId") VALUES
-  ($1, $2, $3);`,
-        [linkUrl, text, userId]
+        `INSERT INTO linkrs ("linkUrl", "text", "userId", "hashtags") VALUES
+  ($1, $2, $3, $4);`,
+        [linkUrl, text, userId, hashtags]
     );
 }
 

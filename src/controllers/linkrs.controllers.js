@@ -24,7 +24,7 @@ export async function insertLink(req, res) {
   }
 
   try {
-    const queryResult = await insertLinkDB(linkUrl, text, userId);
+    const queryResult = await insertLinkDB(linkUrl, text, userId, hashtags);
 
     //função abaixo foi criada para inserir hashtags no banco de dados
     async function insertHashtag(hashtag) {
@@ -37,6 +37,7 @@ export async function insertLink(req, res) {
           `INSERT INTO hashtags ("hashtag", "counter") VALUES ($1, $2);`,
           [hashtag, 1]
         );
+
       } else {
         await connection.query(
           `UPDATE hashtags SET "counter" = "counter" + 1 WHERE "hashtag" = $1;`,
@@ -44,8 +45,6 @@ export async function insertLink(req, res) {
         );
       }
     }
-      
-    //Abaixo não foi alterado, exceto a linha com comentario
 
     if (queryResult.rowCount === 0) {
       console.log(
@@ -58,7 +57,8 @@ export async function insertLink(req, res) {
     for (let hashtag of hashtags) { //aqui foi alterado
       await insertHashtag(hashtag);
     }    
-    res.sendStatus(201);
+
+    return res.sendStatus(201);
   } catch (error) {
     console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
     return res.sendStatus(500);
@@ -71,6 +71,7 @@ export async function getLinks(req, res) {
   const userId = 1;
 
   try {
+
     const queryResult = await selectLastLinks(userId);
 
     if (queryResult.rowCount === 0) {

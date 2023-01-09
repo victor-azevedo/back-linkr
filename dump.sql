@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS linkrs (
   "id" SERIAL PRIMARY KEY,
   "linkUrl" TEXT NOT NULL,
   "text" TEXT,
+  "hashtags" TEXT,
   "userId" BIGINT NOT NULL,
   CONSTRAINT fk_users
     FOREIGN KEY("userId") 
@@ -48,7 +49,7 @@ CREATE TABLE IF NOT EXISTS likes (
     "counter" BIGINT NOT NULL
   );
 
-CREATE TABLE IF NOT EXISTS hashLinkrs (
+CREATE TABLE IF NOT EXISTS hashlinkrs (
   "id" SERIAL PRIMARY KEY,
   "hashtagId" BIGINT NOT NULL,
   "linkId" BIGINT NOT NULL,

@@ -24,6 +24,7 @@ async function getPostsByHashtags(req, res) {
                 linkIsliked: posts[i].linkIsliked,}
                 
             object.push(post);
+
         }
         return res.status(200).send(object);
     }catch (error) {

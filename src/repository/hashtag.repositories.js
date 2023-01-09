@@ -32,7 +32,6 @@ async function rankingHashtags() {
 }
 
 
-
 export { getPostsByHashtag, getUsersById, rankingHashtags };
 
 
