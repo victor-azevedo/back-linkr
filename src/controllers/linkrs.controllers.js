@@ -26,24 +26,33 @@ export async function insertLink(req, res) {
 
   try {
     const queryResult = await insertLinkDB(linkUrl, text, userId);
-
+    const linkId = queryResult.rows[0].id;
+  
     //função abaixo foi criada para inserir hashtags no banco de dados
     async function insertHashtag(hashtag) {
+      let hashtagID = 0;
       const hashtagExists = await connection.query(
-        `SELECT * FROM hashtags WHERE "hashtag" = $1;`,
+        `SELECT * FROM hashtags WHERE "hashtag" = $1; `,
         [hashtag]
       );
       if (hashtagExists.rowCount === 0) {
-        await connection.query(
-          `INSERT INTO hashtags ("hashtag", "counter") VALUES ($1, $2);`,
+        const hashtagID1 = await connection.query(
+          `INSERT INTO hashtags ("hashtag", "counter") VALUES ($1, $2) RETURNING id;`,
           [hashtag, 1]
         );
+        hashtagID = hashtagID1.rows[0].id;
       } else {
-        await connection.query(
-          `UPDATE hashtags SET "counter" = "counter" + 1 WHERE "hashtag" = $1;`,
+        const hashtagID2 = await connection.query(
+          `UPDATE hashtags SET "counter" = "counter" + 1 WHERE "hashtag" = $1 RETURNING id;`,
           [hashtag]
         );
+        hashtagID = hashtagID2.rows[0].id;
       }
+      console.log(hashtagID, " ", linkId)
+      await connection.query(
+        `INSERT INTO hashlinkrs ("hashtagId", "linkId") VALUES ($1, $2);`,
+        [hashtagID, linkId]
+      );
     }
 
     //Abaixo não foi alterado, exceto a linha com comentario
@@ -72,6 +81,8 @@ export async function getLinks(req, res) {
 
   try {
     const queryResult = await selectLastLinks(userId);
+    console.log(queryResult.rows)
+    res.send(queryResult)
 
     if (queryResult.rowCount === 0) {
       res.status(200).send(null);
