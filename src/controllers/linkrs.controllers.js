@@ -190,13 +190,19 @@ export async function deleteLink(req, res) {
   try {
     const { linkrId, user } = res.locals;
 
+     console.log('a')
+
     await connection.query(
       `
     DELETE FROM ${linkrsTb} WHERE id = $1;
-    DELETE FROM ${hashLinkrsTb} WHERE "linkId" = $1;
     `,
-      [linkrId, user.id]
+      [linkrId]
     );
+    await connection.query(
+      `
+      DELETE FROM ${hashLinkrsTb} WHERE "linkId" = $1;
+      `,[ user.id]
+    )
 
     res.sendStatus(200);
   } catch (err) {
