@@ -111,7 +111,7 @@ export async function getLinks(req, res) {
         const linkLikesFound = linksLikes.find(
           ({ linkId }) => Number(linkId) === Number(linkWithMetadata.id)
         );
-        const linkIsLikedByUser = linkLikesFound.likerId ? true : false;
+        const linkIsLikedByUser = linkWithMetadata.likerId ? true : false;
         delete linkWithMetadata.likerId;
         return linkLikesFound
           ? {
