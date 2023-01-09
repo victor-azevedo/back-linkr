@@ -3,8 +3,9 @@ import connection, { linkrsTb } from "../database/db.js";
 export function insertLinkDB(linkUrl, text, userId) {
     return connection.query(
         `INSERT INTO linkrs ("linkUrl", "text", "userId") VALUES
-  ($1, $2, $3);`,
+  ($1, $2, $3) RETURNING id;`,
         [linkUrl, text, userId]
+        //INSERT INTO persons (lastname,firstname) VALUES ('Smith', 'John') RETURNING id;
     );
 }
 
