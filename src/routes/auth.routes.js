@@ -7,7 +7,7 @@ import { signUpSchemaValidation } from "../middlewares/signUpSchemaValidation.mi
 
 const router = Router();
 
-router.post("/signup",signUpSchemaValidation, existsUserValidation, signUp);
-router.post("/signin", signInSchemaValidation,signIn);
+router.post("/signup", signUpSchemaValidation, existsUserValidation, signUp);
+router.post("/signin", signInSchemaValidation, signIn);
 
 export default router;

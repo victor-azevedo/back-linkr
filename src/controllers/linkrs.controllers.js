@@ -10,15 +10,16 @@ import {
 } from "../repository/linkrs.repositories.js";
 
 export async function insertLink(req, res) {
-  // const userId = res.locals.user.id;
-  const userId = 1;
+  const userId = res.locals.user.id;
   const { linkUrl, text } = req.body;
   const hashtags = filterHashtags(text);
-  
+
   //filtro de hashtags
   function filterHashtags(text) {
     const words = text.split(" ");
-    const hashtags = words.filter((word) => word.startsWith("#")).map((word) => word.substring(1));
+    const hashtags = words
+      .filter((word) => word.startsWith("#"))
+      .map((word) => word.substring(1));
     console.log(hashtags);
     return hashtags;
   }
@@ -44,7 +45,7 @@ export async function insertLink(req, res) {
         );
       }
     }
-      
+
     //Abaixo não foi alterado, exceto a linha com comentario
 
     if (queryResult.rowCount === 0) {
@@ -55,9 +56,10 @@ export async function insertLink(req, res) {
       res.status(401).send("inserted none");
       return;
     }
-    for (let hashtag of hashtags) { //aqui foi alterado
+    for (let hashtag of hashtags) {
+      //aqui foi alterado
       await insertHashtag(hashtag);
-    }    
+    }
     res.sendStatus(201);
   } catch (error) {
     console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
@@ -65,16 +67,14 @@ export async function insertLink(req, res) {
   }
 }
 
-
 export async function getLinks(req, res) {
-  // const userId = res.locals.user.id;
-  const userId = 1;
+  const userId = res.locals.user.id;
 
   try {
     const queryResult = await selectLastLinks(userId);
 
     if (queryResult.rowCount === 0) {
-      res.status(200).send("There are no post yet");
+      res.status(200).send(null);
       return;
     }
     const links = [...queryResult.rows];
@@ -141,8 +141,7 @@ export async function getLinks(req, res) {
 }
 
 export async function likeLink(req, res) {
-  // const likerId = res.locals.user.id;
-  const likerId = 1;
+  const likerId = res.locals.user.id;
   const linkId = req.params.id;
 
   try {
@@ -165,8 +164,7 @@ export async function likeLink(req, res) {
 }
 
 export async function dislikeLink(req, res) {
-  // const dislikerId = res.locals.user.id;
-  const dislikerId = 1;
+  const dislikerId = res.locals.user.id;
   const linkId = req.params.id;
 
   try {
@@ -189,39 +187,39 @@ export async function dislikeLink(req, res) {
 }
 
 export async function deleteLink(req, res) {
-    try {
-        const { linkrId, user } = res.locals;
+  try {
+    const { linkrId, user } = res.locals;
 
-        await connection.query(
-            `
+    await connection.query(
+      `
     DELETE FROM ${linkrsTb} WHERE id = $1;
     DELETE FROM ${hashLinkrsTb} WHERE "linkId" = $1;
     `,
-            [linkrId, user.id]
-        );
+      [linkrId, user.id]
+    );
 
-        res.sendStatus(200);
-    } catch (err) {
-        res.status(400).send(err);
-        console.log(err);
-    }
+    res.sendStatus(200);
+  } catch (err) {
+    res.status(400).send(err);
+    console.log(err);
+  }
 }
 
 export async function editLink(req, res) {
-    try {
-      const { textToUpdate, linkrId } = res.locals;
-      await connection.query(
-        `
+  try {
+    const { textToUpdate, linkrId } = res.locals;
+    await connection.query(
+      `
         UPDATE ${linkrsTb}
         SET text = $1
         WHERE id = $2
         `,
-        [textToUpdate, linkrId]
-        );
-        res.sendStatus(200)
-      } catch (err) {
-        res.status(400);
-        res.send(err);
-        console.log(err);
-    }
+      [textToUpdate, linkrId]
+    );
+    res.sendStatus(200);
+  } catch (err) {
+    res.status(400);
+    res.send(err);
+    console.log(err);
+  }
 }
