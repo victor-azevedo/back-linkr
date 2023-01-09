@@ -10,8 +10,7 @@ import {
 } from "../repository/linkrs.repositories.js";
 
 export async function insertLink(req, res) {
-  // const userId = res.locals.user.id;
-  const userId = 13;
+  const userId = res.locals.user.id;
   const { linkUrl, text } = req.body;
   const hashtags = filterHashtags(text);
 
@@ -69,8 +68,7 @@ export async function insertLink(req, res) {
 }
 
 export async function getLinks(req, res) {
-  // const userId = res.locals.user.id;
-  const userId = 1;
+  const userId = res.locals.user.id;
 
   try {
     const queryResult = await selectLastLinks(userId);
@@ -113,7 +111,7 @@ export async function getLinks(req, res) {
         const linkLikesFound = linksLikes.find(
           ({ linkId }) => Number(linkId) === Number(linkWithMetadata.id)
         );
-        const linkIsLikedByUser = linkWithMetadata.likerId ? true : false;
+        const linkIsLikedByUser = linkLikesFound.likerId ? true : false;
         delete linkWithMetadata.likerId;
         return linkLikesFound
           ? {
@@ -143,8 +141,7 @@ export async function getLinks(req, res) {
 }
 
 export async function likeLink(req, res) {
-  // const likerId = res.locals.user.id;
-  const likerId = 1;
+  const likerId = res.locals.user.id;
   const linkId = req.params.id;
 
   try {
@@ -167,8 +164,7 @@ export async function likeLink(req, res) {
 }
 
 export async function dislikeLink(req, res) {
-  // const dislikerId = res.locals.user.id;
-  const dislikerId = 1;
+  const dislikerId = res.locals.user.id;
   const linkId = req.params.id;
 
   try {
