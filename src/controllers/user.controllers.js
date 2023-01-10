@@ -33,7 +33,8 @@ export async function searchUserQuery(req, res) {
 
 export async function getUserInUserPage(req, res) {
   try {
-    const userId = res.locals.user.id;
+    const {userPageId} = res.locals;
+    console.log(userPageId)
     const { rows: linkrs } = await connection.query(
       `
         SELECT l.id, l."linkUrl", l.text, l."userId", json_agg(h."hashtag") as "hashtags", u.username, u."pictureUrl"
@@ -45,9 +46,9 @@ export async function getUserInUserPage(req, res) {
         GROUP BY l.id, l."linkUrl", l.text, l."userId", u.id
         
         `,
-      [userId]
+      [userPageId]
     );
-
+      console.log(linkrs)
     const links = linkrs;
 
     const linksWithMetadata = await Promise.all(
@@ -74,7 +75,7 @@ export async function getUserInUserPage(req, res) {
       })
     );
 
-    const queryLikesResult = await usersLikedLinks(userId);
+    const queryLikesResult = await usersLikedLinks();
     const linksLikes = [...queryLikesResult.rows];
 
     const linksWithMetadataAndLikes = linksWithMetadata.map(
