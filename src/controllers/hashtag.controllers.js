@@ -1,25 +1,13 @@
 import { getUsersById, rankingHashtags } from "../repository/hashtag.repositories.js";
 import urlMetadata from "url-metadata";
 import connection, { hashLinkrsTb, hashtagsTb, linkrsTb, usersTb } from "../database/db.js";
-import { usersLikedLinks } from "../repository/linkrs.repositories.js";
+import { linkrsFilteredByHashtagName, usersLikedLinks } from "../repository/linkrs.repositories.js";
 import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard } from "../helpers/linkrCard.helper.js";
 
 async function getPostsByHashtags(req, res) {
-    const { hashtag } = req.params;
+    const { hashtag: hashtagName } = req.params;
     try {
-        const { rows: posts } = await connection.query(
-            `
-        SELECT l.*, array_agg(h.hashtag) AS hashtags, u.username, u."pictureUrl", u.id
-        FROM ${linkrsTb} l
-        LEFT JOIN ${hashLinkrsTb} hl ON l.id = hl."linkId"
-        LEFT JOIN ${hashtagsTb} h ON hl."hashtagId" = h.id
-        LEFT JOIN ${usersTb} u ON l."userId" = u.id
-        GROUP BY l.id, u.username, u."pictureUrl", u.id
-        HAVING $1 = ANY(array_agg(h.hashtag))
-        `,
-            [hashtag]
-        );
-            console.log(posts);
+        const { rows: posts } = await linkrsFilteredByHashtagName(hashtagName);
         const postsWithMetadata = await insertMetadataIntoLinkrCard(posts);
         const postsWithMetadataAndLikes = await insertLikesIntoLinkrCard(postsWithMetadata);
         

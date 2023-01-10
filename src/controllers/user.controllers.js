@@ -8,6 +8,7 @@ import connection, {
   usersTb,
 } from "../database/db.js";
 import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard } from "../helpers/linkrCard.helper.js";
+import { linkrsFilteredByUserId } from "../repository/linkrs.repositories.js";
 
 export async function searchUserQuery(req, res) {
   try {
@@ -35,19 +36,7 @@ export async function getUserInUserPage(req, res) {
   try {
     const {userPageId} = res.locals;
     console.log(userPageId)
-    const { rows: linkrs } = await connection.query(
-      `
-        SELECT l.id, l."linkUrl", l.text, l."userId", json_agg(h."hashtag") as "hashtags", u.username, u."pictureUrl"
-        FROM ${linkrsTb} l
-        LEFT JOIN ${hashLinkrsTb} hl ON l.id = hl."linkId"
-        LEFT JOIN ${hashtagsTb} h ON hl."hashtagId" = h.id
-        LEFT JOIN ${usersTb} u ON u.id = l."userId"
-        WHERE l."userId" = $1
-        GROUP BY l.id, l."linkUrl", l.text, l."userId", u.id
-        
-        `,
-      [userPageId]
-    );
+    const { rows: linkrs } = await linkrsFilteredByUserId(userPageId);
     const linkrsWithMetadata = await insertMetadataIntoLinkrCard(linkrs);
     const linkrsWithMetadataAndLikes = await insertLikesIntoLinkrCard(linkrsWithMetadata);
 
