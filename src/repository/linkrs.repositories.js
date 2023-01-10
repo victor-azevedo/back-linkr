@@ -46,8 +46,8 @@ export async function checkUserLinkPossession(linkrId, userId) {
 
 export function usersLikedLinks() {
   return connection.query(
-    `SELECT likes."linkId", array_agg(users."username") AS "likers" FROM likes
-      LEFT JOIN users ON likes."likerId" = users.id
+    `SELECT likes."linkId", array_agg(u1."username") AS "likers" FROM likes
+      LEFT JOIN users u1 ON likes."likerId" = u1.id
       GROUP BY likes."linkId"
       ORDER BY likes."linkId" DESC LIMIT 20`
   );
