@@ -81,7 +81,7 @@ export async function insertLink(req, res) {
 }
 
 export async function getLinks(req, res) {
-  const userId = res.locals.user.id;
+  const {id: userId, username} = res.locals.user;
 
   try {
     const queryResult = await selectLastLinks(userId);
@@ -93,13 +93,13 @@ export async function getLinks(req, res) {
     const links = [...queryResult.rows];
 
     const linksWithMetadata = await insertMetadataIntoLinkrCard(links);
-    const linksWithMetadataAndLikes = await insertLikesIntoLinkrCard(linksWithMetadata);
+    const linksWithMetadataAndLikes = await insertLikesIntoLinkrCard(linksWithMetadata, username);
 
 
     res.send(linksWithMetadataAndLikes);
   } catch (error) {
     console.log(
-      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)
+      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message), error
     );
     return res.sendStatus(500);
   }

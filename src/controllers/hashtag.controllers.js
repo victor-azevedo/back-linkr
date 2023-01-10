@@ -6,10 +6,13 @@ import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard } from "../helper
 
 async function getPostsByHashtags(req, res) {
     const { hashtag: hashtagName } = req.params;
+    const {user} = res.locals;
+    console.log(user);
     try {
         const { rows: posts } = await linkrsFilteredByHashtagName(hashtagName);
         const postsWithMetadata = await insertMetadataIntoLinkrCard(posts);
-        const postsWithMetadataAndLikes = await insertLikesIntoLinkrCard(postsWithMetadata);
+        const postsWithMetadataAndLikes = await insertLikesIntoLinkrCard(postsWithMetadata, user.username);
+        console.log(postsWithMetadataAndLikes);
         
         return res.status(200).send(postsWithMetadataAndLikes);
     } catch (error) {

@@ -34,11 +34,12 @@ export async function searchUserQuery(req, res) {
 
 export async function getUserInUserPage(req, res) {
   try {
-    const {userPageId} = res.locals;
+    const {userPageId , user} = res.locals;
+    
     console.log(userPageId)
     const { rows: linkrs } = await linkrsFilteredByUserId(userPageId);
     const linkrsWithMetadata = await insertMetadataIntoLinkrCard(linkrs);
-    const linkrsWithMetadataAndLikes = await insertLikesIntoLinkrCard(linkrsWithMetadata);
+    const linkrsWithMetadataAndLikes = await insertLikesIntoLinkrCard(linkrsWithMetadata, user.username);
 
     res.status(200).send(linkrsWithMetadataAndLikes);
   } catch (error) {

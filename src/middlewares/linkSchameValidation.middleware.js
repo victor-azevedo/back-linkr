@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import dayjs from "dayjs";
-import connection, { linkrsTb } from "../database/db.js";
+import connection, { hashLinkrsTb, likesTb, linkrsTb } from "../database/db.js";
 import {
   linkrEditSchema,
   linkrIdSchema,
@@ -63,5 +63,30 @@ export async function linkEditionValidator(req, res, next) {
     res.status(400);
     res.send(error);
     return;
+  }
+}
+
+
+export async function checkIfLinkrIsLiked(req, res, next) {
+  try {
+    const { user } = res.locals;
+    const { id: linkrId } = req.params;
+    const { rows } = await connection.query(
+      `
+      SELECT *
+      FROM ${likesTb} l
+      WHERE l."linkId" = $1 AND l."likerId" = $2;
+    `, [linkrId, user.id]
+    );
+
+    if (rows.length !== 0) throw new Error("Linkr already liked");
+
+    next();
+  } catch (error) {
+    console.log(
+      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)
+    );
+    res.status(400);
+    res.send(error.message);
   }
 }
