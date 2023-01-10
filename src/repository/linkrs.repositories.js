@@ -11,10 +11,10 @@ export function insertLinkDB(linkUrl, text, userId) {
 
 export function selectLastLinks() {
     return connection.query(
-        `SELECT linkrs.id, "linkUrl", "text", users."username", users."pictureUrl" AS "userPictureUrl", users.id AS "userId"
-        FROM linkrs
-        JOIN users ON linkrs."userId" = users.id
-        ORDER BY linkrs.id DESC LIMIT 20`,
+        `SELECT l.*, users."username", users."pictureUrl" AS "userPictureUrl"
+        FROM linkrs l
+        JOIN users ON l."userId" = users.id
+        ORDER BY l.id DESC LIMIT 20`,
         []
     );
 }
@@ -56,13 +56,13 @@ export function usersLikedLinks() {
 export function linkrsFilteredByUserId (userPageId){
     return connection.query(
         `
-        SELECT l.id, l."linkUrl", l.text, l."userId", json_agg(h."hashtag") as "hashtags", u.username, u."pictureUrl", u.id as "userId"
+        SELECT l.*, json_agg(h."hashtag") as "hashtags", u.username, u."pictureUrl"
         FROM ${linkrsTb} l
         LEFT JOIN ${hashLinkrsTb} hl ON l.id = hl."linkId"
         LEFT JOIN ${hashtagsTb} h ON hl."hashtagId" = h.id
         LEFT JOIN ${usersTb} u ON u.id = l."userId"
         WHERE l."userId" = $1
-        GROUP BY l.id, l."linkUrl", l.text, l."userId", u.id
+        GROUP BY l.id, u.username, u."pictureUrl"
         
         `,
       [userPageId]
