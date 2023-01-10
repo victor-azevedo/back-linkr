@@ -7,7 +7,7 @@ import connection, {
   linkrsTb,
   usersTb,
 } from "../database/db.js";
-import { usersLikedLinks } from "../repository/linkrs.repositories.js";
+import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard } from "../helpers/linkrCard.helper.js";
 
 export async function searchUserQuery(req, res) {
   try {
@@ -48,64 +48,10 @@ export async function getUserInUserPage(req, res) {
         `,
       [userPageId]
     );
-      console.log(linkrs)
-    const links = linkrs;
+    const linkrsWithMetadata = await insertMetadataIntoLinkrCard(linkrs);
+    const linkrsWithMetadataAndLikes = await insertLikesIntoLinkrCard(linkrsWithMetadata);
 
-    const linksWithMetadata = await Promise.all(
-      links.map(async (link) => {
-        try {
-          const linkMetadata = await urlMetadata(link.linkUrl);
-          const { title, description, image } = linkMetadata;
-          const linkWithMetadata = {
-            ...link,
-            linkMetadata: { title, description, image },
-          };
-          return linkWithMetadata;
-        } catch (error) {
-          return {
-            ...link,
-            linkMetadata: {
-              title: "",
-              description: "",
-              image:
-                "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
-            },
-          };
-        }
-      })
-    );
-
-    const queryLikesResult = await usersLikedLinks();
-    const linksLikes = [...queryLikesResult.rows];
-
-    const linksWithMetadataAndLikes = linksWithMetadata.map(
-      (linkWithMetadata) => {
-        const linkLikesFound = linksLikes.find(
-          ({ linkId }) => Number(linkId) === Number(linkWithMetadata.id)
-        );
-        const linkIsLikedByUser = linkWithMetadata.likerId ? true : false;
-        delete linkWithMetadata.likerId;
-        return linkLikesFound
-          ? {
-              ...linkWithMetadata,
-              likes: {
-                linkIsLikedByUser,
-                usersLiked: [...linkLikesFound.likers],
-                count: linkLikesFound.likers.length,
-              },
-            }
-          : {
-              ...linkWithMetadata,
-              likes: {
-                linkIsLikedByUser,
-                usersLiked: [],
-                count: 0,
-              },
-            };
-      }
-    );
-
-    res.status(200).send(linksWithMetadataAndLikes);
+    res.status(200).send(linkrsWithMetadataAndLikes);
   } catch (error) {
     console.log(
       chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)

@@ -2,26 +2,26 @@ import { getUsersById, rankingHashtags } from "../repository/hashtag.repositorie
 import urlMetadata from "url-metadata";
 import connection, { hashLinkrsTb, hashtagsTb, linkrsTb, usersTb } from "../database/db.js";
 import { usersLikedLinks } from "../repository/linkrs.repositories.js";
-import { insertMetadataIntoLinkrCard } from "../helpers/linkrCard.helper.js";
+import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard } from "../helpers/linkrCard.helper.js";
 
 async function getPostsByHashtags(req, res) {
     const { hashtag } = req.params;
     try {
         const { rows: posts } = await connection.query(
             `
-        SELECT l.*, array_agg(h.hashtag) AS hashtags, u.username, u."pictureUrl"
+        SELECT l.*, array_agg(h.hashtag) AS hashtags, u.username, u."pictureUrl", u.id
         FROM ${linkrsTb} l
         LEFT JOIN ${hashLinkrsTb} hl ON l.id = hl."linkId"
         LEFT JOIN ${hashtagsTb} h ON hl."hashtagId" = h.id
         LEFT JOIN ${usersTb} u ON l."userId" = u.id
-        GROUP BY l.id, u.username, u."pictureUrl"
+        GROUP BY l.id, u.username, u."pictureUrl", u.id
         HAVING $1 = ANY(array_agg(h.hashtag))
         `,
             [hashtag]
         );
-
+            console.log(posts);
         const postsWithMetadata = await insertMetadataIntoLinkrCard(posts);
-        const postsWithMetadataAndLikes = await usersLikedLinks(postsWithMetadata);
+        const postsWithMetadataAndLikes = await insertLikesIntoLinkrCard(postsWithMetadata);
         
         return res.status(200).send(postsWithMetadataAndLikes);
     } catch (error) {
