@@ -88,7 +88,7 @@ export async function getLinks(req, res) {
     }
     const links = [...queryResult.rows];
 
-    const queryLikesResult = await usersLikedLinks(userId);
+    const queryLikesResult = await usersLikedLinks();
     const linksLikes = [...queryLikesResult.rows];
 
     const linksWithMetadata = await Promise.all(

@@ -1,32 +1,83 @@
-import { getPostsByHashtag, getUsersById, rankingHashtags } from "../repository/hashtag.repositories.js";
+import {
+    getPostsByHashtag,
+    getUsersById,
+    rankingHashtags,
+} from "../repository/hashtag.repositories.js";
 import urlMetadata from "url-metadata";
+import connection, { hashLinkrsTb, hashtagsTb, linkrsTb, usersTb } from "../database/db.js";
+import { usersLikedLinks } from "../repository/linkrs.repositories.js";
 
 async function getPostsByHashtags(req, res) {
     const { hashtag } = req.params;
     try {
-        const posts = await getPostsByHashtag(hashtag);
+        const { rows: posts } = await connection.query(`
+        SELECT l.id, l."linkUrl", l.text, l."userId", array_agg( DISTINCT h."hashtag") as "hashtags", u.username, u."pictureUrl"
+        FROM linkrs l
+        LEFT JOIN hashLinkrs hl ON l.id = hl."linkId"
+        LEFT JOIN hashtags h ON hl."hashtagId" = h.id
+        LEFT JOIN users u ON u.id = l."userId"
+        LEFT JOIN hashLinkrs hl2 ON l.id = hl2."linkId"
+        LEFT JOIN hashtags h2 ON hl2."hashtagId" = h2.id
+        WHERE h."hashtag" = $1 OR h2."hashtag" = $1
+        GROUP BY l.id, l."linkUrl", l.text, l."userId", u.id
+        `, [hashtag]);
         
-        if (posts.rowCount === 0) {
-            return res.status(200).send("There are no post yet");}
+    const queryLikesResult = await usersLikedLinks();
+    const linksLikes = [...queryLikesResult.rows];
 
-        const object = [];
-        for(let i = 0; i < posts.length; i++) {
-            const users = await getUsersById(posts[i].userId);
-            const linkMetadata = await urlMetadata(posts[i].linkUrl);
-            const { title, description, image } = linkMetadata;
-            let post = {
-                userid: users[0].id,
-                username: users[0].username,
-                userPictureUrl: users[0].pictureUrl,
-                link: posts[i].linkUrl,
-                text: posts[i].text,
-                linkMetadata: { title, description, image },
-                linkIsliked: posts[i].linkIsliked,}
-                
-            object.push(post);
+    const linksWithMetadata = await Promise.all(
+      posts.map(async (link) => {
+        try {
+          const linkMetadata = await urlMetadata(link.linkUrl);
+          const { title, description, image } = linkMetadata;
+          const linkWithMetadata = {
+            ...link,
+            linkMetadata: { title, description, image },
+          };
+          return linkWithMetadata;
+        } catch (error) {
+          return {
+            ...link,
+            linkMetadata: {
+              title: "",
+              description: "",
+              image:
+                "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
+            },
+          };
         }
-        return res.status(200).send(object);
-    }catch (error) {
+      })
+    );
+
+    const linksWithMetadataAndLikes = linksWithMetadata.map(
+      (linkWithMetadata) => {
+        const linkLikesFound = linksLikes.find(
+          ({ linkId }) => Number(linkId) === Number(linkWithMetadata.id)
+        );
+        const linkIsLikedByUser = linkWithMetadata.likerId ? true : false;
+        delete linkWithMetadata.likerId;
+        return linkLikesFound
+          ? {
+              ...linkWithMetadata,
+              likes: {
+                linkIsLikedByUser,
+                usersLiked: [...linkLikesFound.likers],
+                count: linkLikesFound.likers.length,
+              },
+            }
+          : {
+              ...linkWithMetadata,
+              likes: {
+                linkIsLikedByUser,
+                usersLiked: [],
+                count: 0,
+              },
+            };
+      }
+    );
+        console.log(linksWithMetadataAndLikes);
+        return res.status(200).send(linksWithMetadataAndLikes);
+    } catch (error) {
         console.log(error);
         return res.status(500).send(error);
     }
@@ -36,14 +87,13 @@ async function getRankingHashtags(req, res) {
     try {
         const hashtags = await rankingHashtags();
         return res.status(200).send(hashtags);
-    }catch (error) {
+    } catch (error) {
         console.log(error);
         return res.status(500).send(error);
-}
+    }
 }
 
 export { getPostsByHashtags, getRankingHashtags };
-
 
 // id,
 // username,
