@@ -2,6 +2,7 @@ import chalk from "chalk";
 import dayjs from "dayjs";
 import urlMetadata from "url-metadata";
 import connection, { hashLinkrsTb, linkrsTb, usersTb } from "../database/db.js";
+import { filterHashtags, insertHashtag } from "../helpers/hashtag.helper.js";
 import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard } from "../helpers/linkrCard.helper.js";
 import {
   insertLinkDB,
@@ -15,49 +16,9 @@ export async function insertLink(req, res) {
   const userId = res.locals.user.id;
   const { linkUrl, text } = req.body;
   const hashtags = filterHashtags(text);
-
-  //filtro de hashtags
-  function filterHashtags(text) {
-    const words = text.split(" ");
-    const hashtags = words
-      .filter((word) => word.startsWith("#"))
-      .map((word) => word.substring(1));
-    console.log(hashtags);
-    return hashtags;
-  }
-
   try {
     const queryResult = await insertLinkDB(linkUrl, text, userId);
     const linkId = queryResult.rows[0].id;
-
-    //função abaixo foi criada para inserir hashtags no banco de dados
-    async function insertHashtag(hashtag) {
-      let hashtagID = 0;
-      const hashtagExists = await connection.query(
-        `SELECT * FROM hashtags WHERE "hashtag" = $1; `,
-        [hashtag]
-      );
-      if (hashtagExists.rowCount === 0) {
-        const hashtagID1 = await connection.query(
-          `INSERT INTO hashtags ("hashtag", "counter") VALUES ($1, $2) RETURNING id;`,
-          [hashtag, 1]
-        );
-        hashtagID = hashtagID1.rows[0].id;
-      } else {
-        const hashtagID2 = await connection.query(
-          `UPDATE hashtags SET "counter" = "counter" + 1 WHERE "hashtag" = $1 RETURNING id;`,
-          [hashtag]
-        );
-        hashtagID = hashtagID2.rows[0].id;
-      }
-      console.log(hashtagID, " ", linkId);
-      await connection.query(
-        `INSERT INTO hashlinkrs ("hashtagId", "linkId") VALUES ($1, $2);`,
-        [hashtagID, linkId]
-      );
-    }
-
-    //Abaixo não foi alterado, exceto a linha com comentario
 
     if (queryResult.rowCount === 0) {
       console.log(
@@ -68,8 +29,7 @@ export async function insertLink(req, res) {
       return;
     }
     for (let hashtag of hashtags) {
-      //aqui foi alterado
-      await insertHashtag(hashtag);
+      await insertHashtag(hashtag, linkId);
     }
     res.sendStatus(201);
   } catch (error) {
@@ -158,8 +118,6 @@ export async function dislikeLink(req, res) {
 export async function deleteLink(req, res) {
   try {
     const { linkrId, user } = res.locals;
-
-    console.log("a");
 
     await connection.query(
       `

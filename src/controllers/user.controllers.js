@@ -36,7 +36,6 @@ export async function getUserInUserPage(req, res) {
   try {
     const {userPageId , user} = res.locals;
     
-    console.log(userPageId)
     const { rows: linkrs } = await linkrsFilteredByUserId(userPageId);
     const linkrsWithMetadata = await insertMetadataIntoLinkrCard(linkrs);
     const linkrsWithMetadataAndLikes = await insertLikesIntoLinkrCard(linkrsWithMetadata, user.username);

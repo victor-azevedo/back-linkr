@@ -7,7 +7,7 @@ import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard } from "../helper
 async function getPostsByHashtags(req, res) {
     const { hashtag: hashtagName } = req.params;
     const {user} = res.locals;
-    console.log(user);
+
     try {
         const { rows: posts } = await linkrsFilteredByHashtagName(hashtagName);
         const postsWithMetadata = await insertMetadataIntoLinkrCard(posts);
