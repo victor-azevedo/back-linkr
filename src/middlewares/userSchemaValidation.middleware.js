@@ -22,7 +22,7 @@ export async function validateIdForUserPage(req, res, next) {
   try {
     const userIdToValidate = req.params.id;
     const userIdValidated = await userIdSchema.validateAsync(userIdToValidate);
-    res.locals.userId = userIdValidated;
+    res.locals.userPageId = userIdValidated;
     next();
   } catch (error) {
     console.log(
