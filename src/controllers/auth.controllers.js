@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import chalk from "chalk";
+import dayjs from "dayjs";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 
@@ -14,8 +15,10 @@ export async function signUp(req, res) {
     await insertUser(email, passwordHash, username, pictureUrl);
 
     return res.sendStatus(201);
-  } catch (err) {
-    console.log(chalk.redBright(err.message));
+  } catch (error) {
+    console.log(
+      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)
+    );
     return res.sendStatus(500);
   }
 }
@@ -44,7 +47,10 @@ export async function signIn(req, res) {
     const token = generateToken(user.id, user.username, user.pictureUrl);
 
     return res.send({ token });
-  } catch (err) {
+  } catch (error) {
+    console.log(
+      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)
+    );
     return res.sendStatus(500);
   }
 }

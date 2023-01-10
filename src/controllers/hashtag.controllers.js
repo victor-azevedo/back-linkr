@@ -1,5 +1,4 @@
 import {
-    getPostsByHashtag,
     getUsersById,
     rankingHashtags,
 } from "../repository/hashtag.repositories.js";
@@ -12,12 +11,12 @@ async function getPostsByHashtags(req, res) {
     try {
         const { rows: posts } = await connection.query(`
         SELECT l.id, l."linkUrl", l.text, l."userId", array_agg( DISTINCT h."hashtag") as "hashtags", u.username, u."pictureUrl"
-        FROM linkrs l
-        LEFT JOIN hashLinkrs hl ON l.id = hl."linkId"
-        LEFT JOIN hashtags h ON hl."hashtagId" = h.id
-        LEFT JOIN users u ON u.id = l."userId"
-        LEFT JOIN hashLinkrs hl2 ON l.id = hl2."linkId"
-        LEFT JOIN hashtags h2 ON hl2."hashtagId" = h2.id
+        FROM ${linkrsTb} l
+        LEFT JOIN ${hashLinkrsTb} hl ON l.id = hl."linkId"
+        LEFT JOIN ${hashtagsTb} h ON hl."hashtagId" = h.id
+        LEFT JOIN ${usersTb} u ON u.id = l."userId"
+        LEFT JOIN ${hashLinkrsTb} hl2 ON l.id = hl2."linkId"
+        LEFT JOIN ${hashtagsTb} h2 ON hl2."hashtagId" = h2.id
         WHERE h."hashtag" = $1 OR h2."hashtag" = $1
         GROUP BY l.id, l."linkUrl", l.text, l."userId", u.id
         `, [hashtag]);
@@ -84,21 +83,17 @@ async function getPostsByHashtags(req, res) {
 }
 
 async function getRankingHashtags(req, res) {
-    try {
-        const hashtags = await rankingHashtags();
-        return res.status(200).send(hashtags);
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send(error);
-    }
+  try {
+    const hashtags = await rankingHashtags();
+    return res.status(200).send(hashtags);
+  } catch (error) {
+    console.log(
+      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)
+    );
+    return res.status(500).send(error);
+  }
 }
 
 export { getPostsByHashtags, getRankingHashtags };
 
-// id,
-// username,
-// userPictureUrl,
-// link,
-// text,
-// linkMetadata,
-// linkIsliked,
+

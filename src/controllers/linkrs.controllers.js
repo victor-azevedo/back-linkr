@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import dayjs from "dayjs";
 import urlMetadata from "url-metadata";
 import connection, { hashLinkrsTb, linkrsTb, usersTb } from "../database/db.js";
@@ -27,7 +28,7 @@ export async function insertLink(req, res) {
   try {
     const queryResult = await insertLinkDB(linkUrl, text, userId);
     const linkId = queryResult.rows[0].id;
-  
+
     //função abaixo foi criada para inserir hashtags no banco de dados
     async function insertHashtag(hashtag) {
       let hashtagID = 0;
@@ -48,7 +49,7 @@ export async function insertLink(req, res) {
         );
         hashtagID = hashtagID2.rows[0].id;
       }
-      console.log(hashtagID, " ", linkId)
+      console.log(hashtagID, " ", linkId);
       await connection.query(
         `INSERT INTO hashlinkrs ("hashtagId", "linkId") VALUES ($1, $2);`,
         [hashtagID, linkId]
@@ -71,7 +72,9 @@ export async function insertLink(req, res) {
     }
     res.sendStatus(201);
   } catch (error) {
-    console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
+    console.log(
+      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)
+    );
     return res.sendStatus(500);
   }
 }
@@ -144,7 +147,9 @@ export async function getLinks(req, res) {
 
     res.send(linksWithMetadataAndLikes);
   } catch (error) {
-    console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
+    console.log(
+      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)
+    );
     return res.sendStatus(500);
   }
 }
@@ -167,7 +172,9 @@ export async function likeLink(req, res) {
 
     res.sendStatus(201);
   } catch (error) {
-    console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
+    console.log(
+      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)
+    );
     return res.sendStatus(500);
   }
 }
@@ -190,7 +197,9 @@ export async function dislikeLink(req, res) {
 
     res.sendStatus(201);
   } catch (error) {
-    console.log(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message);
+    console.log(
+      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)
+    );
     return res.sendStatus(500);
   }
 }
@@ -199,7 +208,7 @@ export async function deleteLink(req, res) {
   try {
     const { linkrId, user } = res.locals;
 
-     console.log('a')
+    console.log("a");
 
     await connection.query(
       `
@@ -210,13 +219,16 @@ export async function deleteLink(req, res) {
     await connection.query(
       `
       DELETE FROM ${hashLinkrsTb} WHERE "linkId" = $1;
-      `,[ user.id]
-    )
+      `,
+      [user.id]
+    );
 
     res.sendStatus(200);
-  } catch (err) {
-    res.status(400).send(err);
-    console.log(err);
+  } catch (error) {
+    console.log(
+      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)
+    );
+    return res.status(400).send(error);
   }
 }
 
@@ -232,9 +244,12 @@ export async function editLink(req, res) {
       [textToUpdate, linkrId]
     );
     res.sendStatus(200);
-  } catch (err) {
+  } catch (error) {
+    console.log(
+      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)
+    );
     res.status(400);
-    res.send(err);
-    console.log(err);
+    res.send(error);
+    return;
   }
 }
