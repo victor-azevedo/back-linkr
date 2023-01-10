@@ -6,15 +6,6 @@ CREATE TABLE IF NOT EXISTS users (
   "pictureUrl" TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS sessions (
-  "id" SERIAL PRIMARY KEY,
-  "userId" BIGINT UNIQUE NOT NULL,
-  "token" VARCHAR(255) NOT NULL,
-  CONSTRAINT fk_users
-    FOREIGN KEY("userId") 
-	    REFERENCES users("id")
-	    ON DELETE CASCADE
-);
 
 CREATE TABLE IF NOT EXISTS linkrs (
   "id" SERIAL PRIMARY KEY,
@@ -59,6 +50,20 @@ CREATE TABLE IF NOT EXISTS hashLinkrs (
   CONSTRAINT fk_link
     FOREIGN KEY("linkId") 
 	    REFERENCES linkrs("id")
+	    ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS follows (
+  "id" SERIAL PRIMARY KEY,
+  "followerId" BIGINT NOT NULL,
+  "followingId" BIGINT NOT NULL,
+  CONSTRAINT fk_followerId
+    FOREIGN KEY("followerId") 
+	    REFERENCES users("id")
+	    ON DELETE CASCADE,
+  CONSTRAINT fk_followingId
+    FOREIGN KEY("followingId") 
+	    REFERENCES users("id")
 	    ON DELETE CASCADE
 );
 

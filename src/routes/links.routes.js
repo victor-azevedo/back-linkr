@@ -8,6 +8,7 @@ import {
   editLink,
 } from "../controllers/linkrs.controllers.js";
 import {
+  checkIfLinkrIsLiked,
   linkEditionAndDeletionIdValidation,
   linkEditionValidator,
   linkSchemaValidation,
@@ -18,7 +19,7 @@ const linksRouter = Router();
 
 linksRouter.get("/linkrs", authValidation, getLinks);
 linksRouter.post("/linkrs", authValidation, linkSchemaValidation, insertLink);
-linksRouter.post("/linkrs/like/:id", authValidation, likeLink);
+linksRouter.post("/linkrs/like/:id", authValidation, checkIfLinkrIsLiked, likeLink);
 linksRouter.delete("/linkrs/like/:id", authValidation, dislikeLink);
 linksRouter.delete(
   "/linkrs/delete/:id",
