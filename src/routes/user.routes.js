@@ -9,7 +9,7 @@ userRouter.use(authValidation);
 
 userRouter.post('/users/query', validateUserQuery, searchUserQuery);
 userRouter.get('/user/:id', validateIdForUserPage, getUserInUserPage);
-userRouter.get('/follows/:id', isFollowing);
+userRouter.get('/follows/:id?', isFollowing);
 userRouter.delete('/unfollow/:id', unfollowUser);
 userRouter.post('/follow/:id', checkIfUserAlreadyFollows, followUser);
 

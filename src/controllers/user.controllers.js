@@ -55,6 +55,7 @@ export async function followUser(req, res) {
         const { user } = res.locals;
         const { id: userToFollow } = req.params;
         await insertFollow(user.id, userToFollow);
+        res.sendStatus(200);
     } catch (err) {
         console.log(err);
         res.status(400);
