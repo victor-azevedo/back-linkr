@@ -55,6 +55,7 @@ export async function followUser(req, res) {
         const { user } = res.locals;
         const { id: userToFollow } = req.params;
         await insertFollow(user.id, userToFollow);
+        res.sendStatus(200);
     } catch (err) {
         console.log(err);
         res.status(400);
@@ -67,7 +68,13 @@ export async function isFollowing(req, res) {
         const { user } = res.locals;
         const { id: userThatMayBeFollowing } = req.params;
         const { rows: userFollowing } = await getUserThatIsFollowing(user.id, userThatMayBeFollowing)
-        const isFollowing = userFollowing.length !== 0;
+        let isFollowing = false;
+        if (userThatMayBeFollowing){
+             isFollowing = userFollowing.length !== 0;
+
+        } else {
+            isFollowing = userFollowing;
+        }
         res.status(200);
         res.send(isFollowing);
     } catch (err) {
