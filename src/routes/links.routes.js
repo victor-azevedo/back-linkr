@@ -1,38 +1,34 @@
 import { Router } from "express";
 import {
-  insertLink,
-  getLinks,
-  likeLink,
-  dislikeLink,
-  deleteLink,
-  editLink,
+    insertLink,
+    getLinks,
+    likeLink,
+    dislikeLink,
+    deleteLink,
+    editLink,
 } from "../controllers/linkrs.controllers.js";
 import {
-  checkIfLinkrIsLiked,
-  linkEditionAndDeletionIdValidation,
-  linkEditionValidator,
-  linkSchemaValidation,
+    checkIfLinkrIsLiked,
+    linkEditionAndDeletionIdValidation,
+    linkEditionValidator,
+    linkSchemaValidation,
 } from "../middlewares/linkSchameValidation.middleware.js";
 import { authValidation } from "../middlewares/authValidation.middleware.js";
 
 const linksRouter = Router();
 
-linksRouter.get("/linkrs", authValidation, getLinks);
-linksRouter.post("/linkrs", authValidation, linkSchemaValidation, insertLink);
-linksRouter.post("/linkrs/like/:id", authValidation, checkIfLinkrIsLiked, likeLink);
-linksRouter.delete("/linkrs/like/:id", authValidation, dislikeLink);
-linksRouter.delete(
-  "/linkrs/delete/:id",
-  authValidation,
-  linkEditionAndDeletionIdValidation,
-  deleteLink
-);
+linksRouter.use(authValidation);
+
+linksRouter.get("/linkrs", getLinks);
+linksRouter.post("/linkrs", linkSchemaValidation, insertLink);
+linksRouter.post("/linkrs/like/:id", checkIfLinkrIsLiked, likeLink);
+linksRouter.delete("/linkrs/like/:id", dislikeLink);
+linksRouter.delete("/linkrs/delete/:id", linkEditionAndDeletionIdValidation, deleteLink);
 linksRouter.put(
-  "/linkrs/edit/:id",
-  authValidation,
-  linkEditionValidator,
-  linkEditionAndDeletionIdValidation,
-  editLink
+    "/linkrs/edit/:id",
+    linkEditionValidator,
+    linkEditionAndDeletionIdValidation,
+    editLink
 );
 
 export default linksRouter;
