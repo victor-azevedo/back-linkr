@@ -17,7 +17,7 @@ export function insertLinkDB(linkUrl, text, userId) {
 
 export function selectLastLinks(userId) {
   return connection.query(
-    `SELECT l.*, u."username", u."pictureUrl" AS "userPictureUrl", COUNT(c."linkId") AS commentsCount
+    `SELECT l.*, u."username", u."pictureUrl" AS "userPictureUrl", COUNT(c."linkId") AS "commentsCount"
         FROM linkrs l
         JOIN users u ON l."userId" = u.id
         JOIN comments c ON l.id = c."linkId"
