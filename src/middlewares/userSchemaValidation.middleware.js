@@ -42,6 +42,9 @@ export async function checkIfUserAlreadyFollows(req, res, next) {
   try {
     const { user } = res.locals;
     const { id: userThatMayBeFollowing } = req.params;
+    if (user.id === userThatMayBeFollowing) {
+      throw new Error("You cannot follow yourself");
+    }
     const { rows: userFollowing } = await getUserThatIsFollowing(user.id, userThatMayBeFollowing)
     const isFollowing = userFollowing.length !== 0;
     if (isFollowing) {

@@ -16,5 +16,6 @@ export const likesTb = "likes";
 export const hashtagsTb = "hashtags";
 export const hashLinkrsTb = "hashLinkrs"
 export const followsTb = "follows";
+export const repostsTb = "reposts";
 
 export default connection;
