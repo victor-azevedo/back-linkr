@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { insertComment } from "../controllers/comments.controllers.js";
+import {
+  getComments,
+  insertComment,
+} from "../controllers/comments.controllers.js";
 
 import { commentSchemaValidation } from "../middlewares/commentSchemaValidation.middleware.js";
 
@@ -14,5 +17,6 @@ commentsRouter.post(
   commentSchemaValidation,
   insertComment
 );
+commentsRouter.get("/comments/linkr/:id", getComments);
 
 export default commentsRouter;
