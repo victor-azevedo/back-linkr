@@ -67,6 +67,20 @@ CREATE TABLE IF NOT EXISTS follows (
 	    ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS reposts (
+  "id" SERIAL PRIMARY KEY,
+  "linkrId" BIGINT NOT NULL,
+  "reposterId" BIGINT NOT NULL,
+  CONSTRAINT fk_linkrId
+    FOREIGN KEY("linkrId") 
+	    REFERENCES linkrs("id")
+	    ON DELETE CASCADE,
+  CONSTRAINT fk_reposterId
+    FOREIGN KEY("reposterId") 
+	    REFERENCES users("id")
+	    ON DELETE CASCADE
+);
+
 INSERT INTO users ("username", "email", "password", "pictureUrl") VALUES
 ('pele', 'pele@uol.com', '123456', 'https://m.media-amazon.com/images/M/MV5BNGE0MjRkMWYtZGJlMi00YmZiLWJiY2QtMGRlMjRlNDU4MjFjXkEyXkFqcGdeQXVyNjc5NjEzNA@@._V1_.jpg');
 
