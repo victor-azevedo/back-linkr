@@ -81,6 +81,22 @@ CREATE TABLE IF NOT EXISTS reposts (
 	    ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS comments (
+  "id" SERIAL PRIMARY KEY,
+  "commenterId" BIGINT NOT NULL,
+  "linkId" BIGINT NOT NULL,
+  "commentText" TEXT NOT NULL,
+  CONSTRAINT fk_commenter
+    FOREIGN KEY("commenterId") 
+	    REFERENCES users("id")
+	    ON DELETE CASCADE,
+  CONSTRAINT fk_link
+    FOREIGN KEY("linkId") 
+	    REFERENCES linkrs("id")
+	    ON DELETE CASCADE
+);
+
+
 INSERT INTO users ("username", "email", "password", "pictureUrl") VALUES
 ('pele', 'pele@uol.com', '123456', 'https://m.media-amazon.com/images/M/MV5BNGE0MjRkMWYtZGJlMi00YmZiLWJiY2QtMGRlMjRlNDU4MjFjXkEyXkFqcGdeQXVyNjc5NjEzNA@@._V1_.jpg');
 
@@ -114,3 +130,7 @@ INSERT INTO follows ("followerId", "followingId") VALUES
 
 INSERT INTO reposts ("linkrId", "reposterId") VALUES
 (28, 4);
+
+INSERT INTO comments ("commenterId", "linkId", "commentText") VALUES
+(1, 1, 'teste de um comentário');
+
