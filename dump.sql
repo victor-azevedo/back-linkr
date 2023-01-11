@@ -104,3 +104,13 @@ INSERT INTO hashlinkrs ("hashtagId", "linkId") VALUES
 
 INSERT INTO hashlinks ("hashtagId", "linkId") VALUES
 (2, 1);
+
+
+INSERT INTO follows ("followerId", "followingId") VALUES
+(3, 4);
+
+INSERT INTO follows ("followerId", "followingId") VALUES
+(4, 3);
+
+INSERT INTO reposts ("linkrId", "reposterId") VALUES
+(28, 4);
