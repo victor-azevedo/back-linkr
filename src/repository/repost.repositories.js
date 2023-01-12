@@ -15,4 +15,10 @@ async function getRepostsByLinkrId() {
     return reposts.rows;
 }
 
-export { createRepost, getRepostsByLinkrId };
+async function checkReposts(postId, userId) {
+    return connection.query(`
+    SELECT * FROM reposts WHERE "linkrId" = $1 AND "reposterId" = $2;
+    `, [postId, userId]);
+}
+
+export { createRepost, getRepostsByLinkrId, checkReposts };

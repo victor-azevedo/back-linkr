@@ -15,6 +15,7 @@ import {
 } from "../middlewares/linkSchameValidation.middleware.js";
 import { authValidation } from "../middlewares/authValidation.middleware.js";
 import { createRepostController } from "../controllers/repost.controllers.js";
+import { preventDoubleRepost } from "../middlewares/repostSchemaValidation.middleware.js";
 
 const linksRouter = Router();
 
@@ -31,6 +32,6 @@ linksRouter.put(
     linkEditionAndDeletionIdValidation,
     editLink
 );
-linksRouter.post("/linkrs/repost", authValidation, createRepostController)
+linksRouter.post("/linkrs/repost", preventDoubleRepost,  createRepostController)
 
 export default linksRouter;

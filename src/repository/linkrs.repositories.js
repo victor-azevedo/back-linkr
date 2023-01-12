@@ -17,15 +17,30 @@ export function insertLinkDB(linkUrl, text, userId) {
 
 export function selectLastLinks(userId) {
   return connection.query(
-    `SELECT l.*, u."username", u."pictureUrl" AS "userPictureUrl", COUNT(c."linkId") AS "commentsCount"
-        FROM linkrs l
-        JOIN users u ON l."userId" = u.id
-        LEFT JOIN ${followsTb} f ON l."userId" = f."followingId"
-        LEFT JOIN ${repostsTb} r ON l.id = r."linkrId"
-        LEFT JOIN comments c ON l.id = c."linkId"
-        WHERE l."userId" = $1 OR f."followerId" = $1 OR r."reposterId" = ANY(SELECT "followingId" FROM ${followsTb} WHERE "followerId" = $1)
-        GROUP BY l.id, u."username", "userPictureUrl"
-        ORDER BY l.id DESC LIMIT 10`,
+    `SELECT l.*, u."username", u."pictureUrl" AS "userPictureUrl", COUNT(c."linkId") AS "commentsCount", 
+            (SELECT us.username 
+              FROM ${usersTb} us 
+              LEFT JOIN ${repostsTb} r2 ON us.id = r2."reposterId"
+              WHERE us.id = ANY(array_agg(r."reposterId")) 
+              AND (us.id = ANY(SELECT "followingId" 
+                                FROM ${followsTb} 
+                                WHERE "followerId" = $1) 
+                                OR us.id = $1)  
+              ORDER BY r2.id DESC LIMIT 1 ) AS "reposter"
+      FROM linkrs l
+      JOIN users u ON l."userId" = u.id
+      LEFT JOIN ${followsTb} f ON l."userId" = f."followingId"
+      LEFT JOIN ${repostsTb} r ON l.id = r."linkrId"
+      LEFT JOIN comments c ON l.id = c."linkId"
+      WHERE 
+      l."userId" = $1 
+      OR f."followerId" = $1 
+      OR r."reposterId" = $1
+      OR r."reposterId" = ANY(SELECT "followingId" 
+                                FROM ${followsTb} 
+                                WHERE "followerId" = $1) 
+      GROUP BY l.id, u."username", "userPictureUrl"
+      ORDER BY l.id DESC LIMIT 10`,
     [userId]
   );
 }
