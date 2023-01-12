@@ -57,7 +57,7 @@ export async function getLinks(req, res) {
 
     const linksWithMetadata = await insertMetadataIntoLinkrCard(links);
     const linksWithMetadataAndLikes = await insertLikesIntoLinkrCard(linksWithMetadata, username);
-    const linkWithMetadataAndLikesAndAmountOfReposts = await insertRepostsNumberIntoLinkrCard(linksWithMetadataAndLikes, repostsQuantity)
+    const linkWithMetadataAndLikesAndAmountOfReposts = await insertRepostsNumberIntoLinkrCard(linksWithMetadataAndLikes)
 
 
     res.send(linkWithMetadataAndLikesAndAmountOfReposts);
