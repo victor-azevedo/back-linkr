@@ -10,7 +10,6 @@ export async function pageParse(req, res, next) {
 
     if (page > 0) {
       offset = (Number(page) - 1) * 10 || 0;
-      limit = Number(page) * 10 || 10;
     }
 
     res.locals.offset = offset;

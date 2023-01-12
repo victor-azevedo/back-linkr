@@ -3,7 +3,11 @@ import dayjs from "dayjs";
 import urlMetadata from "url-metadata";
 import connection, { hashLinkrsTb, linkrsTb, usersTb } from "../database/db.js";
 import { filterHashtags, insertHashtag } from "../helpers/hashtag.helper.js";
-import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard, insertRepostsNumberIntoLinkrCard } from "../helpers/linkrCard.helper.js";
+import {
+  insertLikesIntoLinkrCard,
+  insertMetadataIntoLinkrCard,
+  insertRepostsNumberIntoLinkrCard,
+} from "../helpers/linkrCard.helper.js";
 import {
   insertLinkDB,
   selectLastLinks,
@@ -12,7 +16,6 @@ import {
   removeLikeLinkDB,
 } from "../repository/linkrs.repositories.js";
 import { getRepostsByLinkrId } from "../repository/repost.repositories.js";
-
 
 export async function insertLink(req, res) {
   const userId = res.locals.user.id;
@@ -43,10 +46,13 @@ export async function insertLink(req, res) {
 }
 
 export async function getLinks(req, res) {
-  const {id: userId, username} = res.locals.user;
+  const { id: userId, username } = res.locals.user;
+  const offset = res.locals.offset;
+  const limit = res.locals.limit;
 
   try {
-    const queryResult = await selectLastLinks(userId);
+    const queryResult = await selectLastLinks(userId, limit, offset);
+
     const repostsQuantity = await getRepostsByLinkrId();
 
     if (queryResult.rowCount === 0) {
@@ -56,14 +62,21 @@ export async function getLinks(req, res) {
     const links = [...queryResult.rows];
 
     const linksWithMetadata = await insertMetadataIntoLinkrCard(links);
-    const linksWithMetadataAndLikes = await insertLikesIntoLinkrCard(linksWithMetadata, username);
-    const linkWithMetadataAndLikesAndAmountOfReposts = await insertRepostsNumberIntoLinkrCard(linksWithMetadataAndLikes, repostsQuantity)
-
+    const linksWithMetadataAndLikes = await insertLikesIntoLinkrCard(
+      linksWithMetadata,
+      username
+    );
+    const linkWithMetadataAndLikesAndAmountOfReposts =
+      await insertRepostsNumberIntoLinkrCard(
+        linksWithMetadataAndLikes,
+        repostsQuantity
+      );
 
     res.send(linkWithMetadataAndLikesAndAmountOfReposts);
   } catch (error) {
     console.log(
-      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message), error
+      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message),
+      error
     );
     return res.sendStatus(500);
   }
