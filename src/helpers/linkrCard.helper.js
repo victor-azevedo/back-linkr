@@ -62,3 +62,28 @@ export async function insertLikesIntoLinkrCard(linkrCardArray, authenticatedUser
 
     return linkrsWithLikes;
 }
+
+export async function insertRepostsNumberIntoLinkrCard(linkrCardArray, repostsQuantity){
+  
+    const linkrsWithRepostsNumber = linkrCardArray.map((linkr) => {
+        const linkRepostsFound = repostsQuantity.find(({ linkrId }) => {
+            return Number(linkrId) === Number(linkr.id);
+        }); 
+
+        if (linkRepostsFound) {
+            const repostsNumber = linkRepostsFound.count;
+            return {
+                ...linkr,
+                repostsNumber: (repostsNumber-1),
+            };
+        } else {
+            return {
+                ...linkr,
+                repostsNumber: 0,
+            };
+        }
+    });
+    
+    return linkrsWithRepostsNumber;
+}
+    
