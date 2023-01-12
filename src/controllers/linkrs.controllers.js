@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import urlMetadata from "url-metadata";
 import connection, { hashLinkrsTb, linkrsTb, usersTb } from "../database/db.js";
 import { filterHashtags, insertHashtag } from "../helpers/hashtag.helper.js";
-import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard } from "../helpers/linkrCard.helper.js";
+import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard, insertRepostsNumberIntoLinkrCard } from "../helpers/linkrCard.helper.js";
 import {
   insertLinkDB,
   selectLastLinks,
@@ -11,6 +11,8 @@ import {
   insertLikeLinkDB,
   removeLikeLinkDB,
 } from "../repository/linkrs.repositories.js";
+import { getRepostsByLinkrId } from "../repository/repost.repositories.js";
+
 
 export async function insertLink(req, res) {
   const userId = res.locals.user.id;
@@ -45,6 +47,7 @@ export async function getLinks(req, res) {
 
   try {
     const queryResult = await selectLastLinks(userId);
+    const repostsQuantity = await getRepostsByLinkrId();
 
     if (queryResult.rowCount === 0) {
       res.status(200).send(null);
@@ -54,9 +57,10 @@ export async function getLinks(req, res) {
 
     const linksWithMetadata = await insertMetadataIntoLinkrCard(links);
     const linksWithMetadataAndLikes = await insertLikesIntoLinkrCard(linksWithMetadata, username);
+    const linkWithMetadataAndLikesAndAmountOfReposts = await insertRepostsNumberIntoLinkrCard(linksWithMetadataAndLikes, repostsQuantity)
 
 
-    res.send(linksWithMetadataAndLikes);
+    res.send(linkWithMetadataAndLikesAndAmountOfReposts);
   } catch (error) {
     console.log(
       chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message), error
