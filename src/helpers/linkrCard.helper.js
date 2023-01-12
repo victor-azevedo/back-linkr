@@ -30,7 +30,6 @@ export async function insertMetadataIntoLinkrCard(linkrCardArray) {
 export async function insertLikesIntoLinkrCard(linkrCardArray, authenticatedUsername) {
     const queryLikesResult = await usersLikedLinks();
     const linksLikes = [...queryLikesResult.rows];
-    console.log(linksLikes);
 
     const linkrsWithLikes = linkrCardArray.map((linkr) => {
         const linkLikesFound = linksLikes.find(({ linkId }) => {

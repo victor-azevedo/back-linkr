@@ -1,4 +1,4 @@
-import connection, { hashLinkrsTb, hashtagsTb, linkrsTb, usersTb } from "../database/db.js";
+import connection, { followsTb, hashLinkrsTb, hashtagsTb, linkrsTb, repostsTb, usersTb } from "../database/db.js";
 
 export function insertLinkDB(linkUrl, text, userId) {
     return connection.query(
@@ -9,13 +9,16 @@ export function insertLinkDB(linkUrl, text, userId) {
     );
 }
 
-export function selectLastLinks() {
+export function selectLastLinks(userId) {
     return connection.query(
-        `SELECT l.*, users."username", users."pictureUrl" AS "userPictureUrl"
+        `SELECT l.*, u."username", u."pictureUrl" AS "userPictureUrl"
         FROM linkrs l
-        JOIN users ON l."userId" = users.id
-        ORDER BY l.id DESC LIMIT 20`,
-        []
+        JOIN users u ON l."userId" = u.id
+        LEFT JOIN ${followsTb} f ON l."userId" = f."followingId"
+        LEFT JOIN ${repostsTb} r ON l.id = r."linkrId"
+        WHERE l."userId" = $1 OR f."followerId" = $1 OR r."reposterId" = ANY(SELECT "followingId" FROM ${followsTb} WHERE "followerId" = $1)
+        ORDER BY l.id DESC LIMIT 10`,
+        [userId]
     );
 }
 

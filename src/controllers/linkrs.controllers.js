@@ -2,12 +2,8 @@ import chalk from "chalk";
 import dayjs from "dayjs";
 import urlMetadata from "url-metadata";
 import connection, { hashLinkrsTb, linkrsTb, usersTb } from "../database/db.js";
-<<<<<<< Updated upstream
-import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard } from "../helpers/linkrCard.helper.js";
-=======
 import { filterHashtags, insertHashtag } from "../helpers/hashtag.helper.js";
 import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard, insertRepostsNumberIntoLinkrCard } from "../helpers/linkrCard.helper.js";
->>>>>>> Stashed changes
 import {
   insertLinkDB,
   selectLastLinks,
