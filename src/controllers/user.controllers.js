@@ -15,14 +15,22 @@ import { getUserThatIsFollowing, insertFollow, removeFollow } from "../repositor
 export async function searchUserQuery(req, res) {
     try {
         const { searchText } = res.locals;
+        const { user } = res.locals;
 
         const { rows: users } = await connection.query(
             ` 
-            SELECT id, username, "pictureUrl"
-            FROM ${usersTb}
-            WHERE username ILIKE CONCAT($1::text, '%') 
+            SELECT u.id, u.username, u."pictureUrl", 
+            (CASE
+                WHEN f."followerId" = $2 THEN TRUE
+                ELSE FALSE
+            END) 
+            AS "isFollowing"
+            FROM ${usersTb} u
+            LEFT JOIN ${followsTb} f ON f."followingId" = u.id AND f."followerId" = $2
+            WHERE username ILIKE CONCAT($1::text, '%')
+            ORDER BY "isFollowing" DESC, username ASC
         `,
-            [searchText]
+            [searchText, user.id]
         );
 
         res.status(200).send(users);

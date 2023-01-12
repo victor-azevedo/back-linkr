@@ -1,4 +1,4 @@
-import { getUsersById, rankingHashtags } from "../repository/hashtag.repositories.js";
+import { rankingHashtags } from "../repository/hashtag.repositories.js";
 import urlMetadata from "url-metadata";
 import connection, { hashLinkrsTb, hashtagsTb, linkrsTb, usersTb } from "../database/db.js";
 import { linkrsFilteredByHashtagName, usersLikedLinks } from "../repository/linkrs.repositories.js";
@@ -10,9 +10,9 @@ async function getPostsByHashtags(req, res) {
 
     try {
         const { rows: posts } = await linkrsFilteredByHashtagName(hashtagName);
+        console.log(posts)
         const postsWithMetadata = await insertMetadataIntoLinkrCard(posts);
         const postsWithMetadataAndLikes = await insertLikesIntoLinkrCard(postsWithMetadata, user.username);
-        console.log(postsWithMetadataAndLikes);
         
         return res.status(200).send(postsWithMetadataAndLikes);
     } catch (error) {
