@@ -1,7 +1,10 @@
 import chalk from "chalk";
 import dayjs from "dayjs";
 
-import { insertCommentDB } from "../repository/comments.repositories.js";
+import {
+  insertCommentDB,
+  getCommentsDb,
+} from "../repository/comments.repositories.js";
 
 export async function insertComment(req, res) {
   const linkId = req.params.id;
@@ -20,6 +23,21 @@ export async function insertComment(req, res) {
       return;
     }
     return res.sendStatus(201);
+  } catch (error) {
+    console.log(
+      chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)
+    );
+    return res.sendStatus(500);
+  }
+}
+
+export async function getComments(req, res) {
+  const linkId = req.params.id;
+
+  try {
+    const queryResult = await getCommentsDb(linkId);
+
+    return res.send(queryResult.rows);
   } catch (error) {
     console.log(
       chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message)

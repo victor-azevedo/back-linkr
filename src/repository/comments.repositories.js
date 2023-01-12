@@ -7,3 +7,13 @@ export function insertCommentDB(commenterId, commentText, linkId) {
     [commenterId, linkId, commentText]
   );
 }
+
+export function getCommentsDb(linkId) {
+  return connection.query(
+    `SELECT c."commentText", u."username" AS "commenterName", u."pictureUrl" AS "commenterPicture"
+      FROM comments c
+        JOIN users u ON c."commenterId" = u.id
+        WHERE c."linkId" = $1`,
+    [linkId]
+  );
+}
