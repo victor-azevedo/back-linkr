@@ -68,13 +68,13 @@ export function usersLikedLinks() {
 export function linkrsFilteredByUserId(userPageId) {
   return connection.query(
     `
-        SELECT l.*, json_agg(h."hashtag") as "hashtags", u.username, u."pictureUrl"
+        SELECT l.*, json_agg(h."hashtag") as "hashtags", u.username, u."pictureUrl" as "userPictureUrl"
         FROM ${linkrsTb} l
         LEFT JOIN ${hashLinkrsTb} hl ON l.id = hl."linkId"
         LEFT JOIN ${hashtagsTb} h ON hl."hashtagId" = h.id
         LEFT JOIN ${usersTb} u ON u.id = l."userId"
         WHERE l."userId" = $1
-        GROUP BY l.id, u.username, u."pictureUrl"
+        GROUP BY l.id, u.username, "userPictureUrl"
         
         `,
     [userPageId]
@@ -84,12 +84,12 @@ export function linkrsFilteredByUserId(userPageId) {
 export function linkrsFilteredByHashtagName(hashtagName) {
   return connection.query(
     `
-    SELECT l.*, array_agg(h.hashtag) AS hashtags, u.username, u."pictureUrl", u.id as "userId"
+    SELECT l.*, array_agg(h.hashtag) AS hashtags, u.username, u."pictureUrl" as "userPictureUrl", u.id as "userId"
     FROM ${linkrsTb} l
     LEFT JOIN ${hashLinkrsTb} hl ON l.id = hl."linkId"
     LEFT JOIN ${hashtagsTb} h ON hl."hashtagId" = h.id
     LEFT JOIN ${usersTb} u ON l."userId" = u.id
-    GROUP BY l.id, u.username, u."pictureUrl", u.id
+    GROUP BY l.id, u.username, "userPictureUrl", u.id
     HAVING $1 = ANY(array_agg(h.hashtag))
     `,
     [hashtagName]
