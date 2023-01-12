@@ -9,10 +9,11 @@ async function createRepost(repost) {
 }
 
 async function getRepostsByLinkrId() {
-   const { rows } = await connection.query(`
-        SELECT * FROM reposts 
+    //return linkrId and amount of reposts with each linkrId
+    const reposts = await connection.query(`
+        SELECT "linkrId", COUNT(*) FROM reposts GROUP BY "linkrId";
     `);
-    return rows;
+    return reposts.rows;
 }
 
 export { createRepost, getRepostsByLinkrId };
