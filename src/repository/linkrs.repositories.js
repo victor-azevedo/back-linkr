@@ -20,9 +20,9 @@ export function selectLastLinks(userId) {
     `SELECT l.*, u."username", u."pictureUrl" AS "userPictureUrl", COUNT(c."linkId") AS "commentsCount"
         FROM linkrs l
         JOIN users u ON l."userId" = u.id
-        JOIN comments c ON l.id = c."linkId"
         LEFT JOIN ${followsTb} f ON l."userId" = f."followingId"
         LEFT JOIN ${repostsTb} r ON l.id = r."linkrId"
+        LEFT JOIN comments c ON l.id = c."linkId"
         WHERE l."userId" = $1 OR f."followerId" = $1 OR r."reposterId" = ANY(SELECT "followingId" FROM ${followsTb} WHERE "followerId" = $1)
         GROUP BY l.id, u."username", "userPictureUrl"
         ORDER BY l.id DESC LIMIT 10`,
