@@ -56,7 +56,7 @@ export async function getLinks(req, res) {
     const repostsQuantity = await getRepostsByLinkrId();
 
     if (queryResult.rowCount === 0) {
-      res.status(200).send(null);
+      res.send([]);
       return;
     }
     const links = [...queryResult.rows];
@@ -67,8 +67,8 @@ export async function getLinks(req, res) {
       linksWithMetadata,
       username
     );
-    const linkWithMetadataAndLikesAndAmountOfReposts = await insertRepostsNumberIntoLinkrCard(linksWithMetadataAndLikes)
-
+    const linkWithMetadataAndLikesAndAmountOfReposts =
+      await insertRepostsNumberIntoLinkrCard(linksWithMetadataAndLikes);
 
     res.send(linkWithMetadataAndLikesAndAmountOfReposts);
   } catch (error) {
