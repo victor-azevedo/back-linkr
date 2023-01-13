@@ -83,11 +83,12 @@ export function usersLikedLinks() {
 export function linkrsFilteredByUserId(userPageId, limit, offset) {
   return connection.query(
     `
-        SELECT l.*, json_agg(h."hashtag") as "hashtags", u.username, u."pictureUrl" as "userPictureUrl"
+        SELECT l.*, json_agg(h."hashtag") as "hashtags", u.username, u."pictureUrl" as "userPictureUrl", COUNT(c."linkId") AS "commentsCount"
         FROM ${linkrsTb} l
         LEFT JOIN ${hashLinkrsTb} hl ON l.id = hl."linkId"
         LEFT JOIN ${hashtagsTb} h ON hl."hashtagId" = h.id
         LEFT JOIN ${usersTb} u ON u.id = l."userId"
+        LEFT JOIN comments c ON l.id = c."linkId"
         WHERE l."userId" = $1
         GROUP BY l.id, u.username, "userPictureUrl"
         ORDER BY l.id DESC LIMIT $2 OFFSET $3`,
@@ -98,11 +99,12 @@ export function linkrsFilteredByUserId(userPageId, limit, offset) {
 export function linkrsFilteredByHashtagName(hashtagName) {
   return connection.query(
     `
-    SELECT l.*, array_agg(h.hashtag) AS hashtags, u.username, u."pictureUrl" as "userPictureUrl", u.id as "userId"
+    SELECT l.*, array_agg(h.hashtag) AS hashtags, u.username, u."pictureUrl" as "userPictureUrl", u.id as "userId", COUNT(c."linkId") AS "commentsCount"
     FROM ${linkrsTb} l
     LEFT JOIN ${hashLinkrsTb} hl ON l.id = hl."linkId"
     LEFT JOIN ${hashtagsTb} h ON hl."hashtagId" = h.id
     LEFT JOIN ${usersTb} u ON l."userId" = u.id
+    LEFT JOIN comments c ON l.id = c."linkId"
     GROUP BY l.id, u.username, "userPictureUrl", u.id
     HAVING $1 = ANY(array_agg(h.hashtag))
     `,
