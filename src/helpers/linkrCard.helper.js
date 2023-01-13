@@ -1,5 +1,6 @@
 import urlMetadata from "url-metadata";
 import { usersLikedLinks } from "../repository/linkrs.repositories.js";
+import { getRepostsByLinkrId } from "../repository/repost.repositories.js";
 
 export async function insertMetadataIntoLinkrCard(linkrCardArray) {
     const linkrsWithMetadata = await Promise.all(
@@ -63,10 +64,12 @@ export async function insertLikesIntoLinkrCard(linkrCardArray, authenticatedUser
     return linkrsWithLikes;
 }
 
-export async function insertRepostsNumberIntoLinkrCard(linkrCardArray, repostsQuantity){
+export async function insertRepostsNumberIntoLinkrCard(linkrCardArray){
+
+    const repostQuantity = await getRepostsByLinkrId();
   
     const linkrsWithRepostsNumber = linkrCardArray.map((linkr) => {
-        const linkRepostsFound = repostsQuantity.find(({ linkrId }) => {
+        const linkRepostsFound = repostQuantity.find(({ linkrId }) => {
             return Number(linkrId) === Number(linkr.id);
         }); 
 
@@ -74,7 +77,7 @@ export async function insertRepostsNumberIntoLinkrCard(linkrCardArray, repostsQu
             const repostsNumber = linkRepostsFound.count;
             return {
                 ...linkr,
-                repostsNumber: (repostsNumber-1),
+                repostsNumber: (repostsNumber),
             };
         } else {
             return {

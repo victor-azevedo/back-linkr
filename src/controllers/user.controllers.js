@@ -8,6 +8,7 @@ import connection, {
 import {
     insertLikesIntoLinkrCard,
     insertMetadataIntoLinkrCard,
+    insertRepostsNumberIntoLinkrCard,
 } from "../helpers/linkrCard.helper.js";
 import { linkrsFilteredByUserId } from "../repository/linkrs.repositories.js";
 import { getUserThatIsFollowing, insertFollow, removeFollow } from "../repository/users.repositories.js";
@@ -50,8 +51,9 @@ export async function getUserInUserPage(req, res) {
             linkrsWithMetadata,
             user.username
         );
+        const linkrsWithMetatadataLikesAndReposts = await insertRepostsNumberIntoLinkrCard(linkrsWithMetadataAndLikes);
 
-        res.status(200).send(linkrsWithMetadataAndLikes);
+        res.status(200).send(linkrsWithMetatadataLikesAndReposts);
     } catch (error) {
         console.log(chalk.redBright(dayjs().format("YYYY-MM-DD HH:mm:ss"), error.message));
         res.status(400).send(error);
