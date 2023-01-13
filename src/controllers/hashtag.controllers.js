@@ -2,7 +2,7 @@ import { rankingHashtags } from "../repository/hashtag.repositories.js";
 import urlMetadata from "url-metadata";
 import connection, { hashLinkrsTb, hashtagsTb, linkrsTb, usersTb } from "../database/db.js";
 import { linkrsFilteredByHashtagName, usersLikedLinks } from "../repository/linkrs.repositories.js";
-import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard } from "../helpers/linkrCard.helper.js";
+import { insertLikesIntoLinkrCard, insertMetadataIntoLinkrCard, insertRepostsNumberIntoLinkrCard } from "../helpers/linkrCard.helper.js";
 
 async function getPostsByHashtags(req, res) {
     const { hashtag: hashtagName } = req.params;
@@ -13,8 +13,9 @@ async function getPostsByHashtags(req, res) {
         console.log(posts)
         const postsWithMetadata = await insertMetadataIntoLinkrCard(posts);
         const postsWithMetadataAndLikes = await insertLikesIntoLinkrCard(postsWithMetadata, user.username);
+        const linkrsWithMetatadataLikesAndReposts = await insertRepostsNumberIntoLinkrCard(postsWithMetadataAndLikes);
         
-        return res.status(200).send(postsWithMetadataAndLikes);
+        return res.status(200).send(linkrsWithMetatadataLikesAndReposts);
     } catch (error) {
         console.log(error);
         return res.status(500).send(error);
