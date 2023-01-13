@@ -80,7 +80,7 @@ export function usersLikedLinks() {
   );
 }
 
-export function linkrsFilteredByUserId(userPageId) {
+export function linkrsFilteredByUserId(userPageId, limit, offset) {
   return connection.query(
     `
         SELECT l.*, json_agg(h."hashtag") as "hashtags", u.username, u."pictureUrl" as "userPictureUrl"
@@ -90,9 +90,8 @@ export function linkrsFilteredByUserId(userPageId) {
         LEFT JOIN ${usersTb} u ON u.id = l."userId"
         WHERE l."userId" = $1
         GROUP BY l.id, u.username, "userPictureUrl"
-        
-        `,
-    [userPageId]
+        ORDER BY l.id DESC LIMIT $2 OFFSET $3`,
+    [userPageId, limit, offset]
   );
 }
 
