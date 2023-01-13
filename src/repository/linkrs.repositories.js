@@ -15,7 +15,7 @@ export function insertLinkDB(linkUrl, text, userId) {
   );
 }
 
-export function selectLastLinks(userId) {
+export function selectLastLinks(userId, limit, offset) {
   return connection.query(
     `SELECT l.*, u."username", u."pictureUrl" AS "userPictureUrl", COUNT(c."linkId") AS "commentsCount", 
             (SELECT us.username 
@@ -40,8 +40,8 @@ export function selectLastLinks(userId) {
                                 FROM ${followsTb} 
                                 WHERE "followerId" = $1) 
       GROUP BY l.id, u."username", "userPictureUrl"
-      ORDER BY l.id DESC LIMIT 10`,
-    [userId]
+      ORDER BY l.id DESC LIMIT $2 OFFSET $3`,
+    [userId, limit, offset]
   );
 }
 
